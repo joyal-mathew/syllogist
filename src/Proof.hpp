@@ -9,6 +9,7 @@
 namespace InferenceRule {
     enum InferenceRule {
         Assume,
+        Reiteration,
         ContradictionIntroduction,
         ContradictionElimination,
         NegationIntroduction,
