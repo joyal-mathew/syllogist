@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Expr.hpp"
-#include "Resolution.hpp"
+#include "TruthTree.hpp"
 
 #include <optional>
 #include <vector>
@@ -37,4 +37,4 @@ struct Proof {
     std::vector<Step> proof;
 };
 
-Proof to_proof(const ResolutionContext &resolution_context);
+Proof to_proof(TruthNode *root);

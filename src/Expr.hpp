@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Clause.hpp"
+#include "types.hpp"
 
+#include <ostream>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -9,6 +10,7 @@
 namespace ExprType {
     enum ExprType {
         Atom,
+        Contradiction,
         Negation,
         Conjunction,
         Disjunction,
@@ -17,31 +19,37 @@ namespace ExprType {
     };
 }
 
+class Expr;
+
+typedef std::variant<std::pair<Expr *, Expr *>, Expr *, u16, std::monostate>
+    ExprDataUnion;
+
 class Expr {
 private:
-    ExprType::ExprType type;
-    std::variant<std::pair<Expr *, Expr *>, Expr *, u16> data;
+     ExprDataUnion data;
 
 public:
+    ExprType::ExprType type;
+
+    Expr(ExprType::ExprType type, ExprDataUnion data)
+        : data(data), type(type) {}
+
+    Expr(ExprType::ExprType type) : data(std::monostate{}), type(type) {}
+    Expr(ExprType::ExprType type, u16 symbol) : data(symbol), type(type) {}
+    Expr(ExprType::ExprType type, Expr *operand) : data(operand), type(type) {}
     Expr(ExprType::ExprType type, Expr *lhs, Expr *rhs)
-        : type(type), data(std::make_pair(lhs, rhs)) {}
+        : data(std::make_pair(lhs, rhs)), type(type) {}
 
-    Expr(ExprType::ExprType type, Expr *operand) : type(type), data(operand) {}
+    Expr(const Expr &expr);
+    ~Expr();
 
-    Expr(ExprType::ExprType type, u16 symbol) : type(type), data(symbol) {}
+    void negate();
+    void unnegate();
+    Expr *get_negation() const;
+    Expr *get_unnegation() const;
+    std::pair<Expr *, Expr *> decompose() const;
 
-    static Expr atom(u16 symbol) { return Expr(ExprType::Atom, symbol); }
-
-    static Expr negation(Expr *operand) {
-        return Expr(ExprType::Negation, operand);
-    }
-
-    static Expr binary(ExprType::ExprType type, Expr *lhs, Expr *rhs) {
-        return Expr(type, lhs, rhs);
-    }
-
-    static Expr from_clause(Clause clause);
-
-    void to_cnf();
-    std::vector<Clause> to_clauses() const;
+    friend std::ostream &operator<<(std::ostream &out, const Expr &expr);
 };
+
+std::ostream &operator<<(std::ostream &out, const Expr &expr);
