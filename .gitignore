@@ -1,3 +1,4 @@
 .clangd
 .clang-format
-build
+build/*
+.vscode

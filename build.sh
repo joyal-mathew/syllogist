@@ -8,6 +8,8 @@ RUN=false
 
 VALGRIND=false
 
+FILE="arguments.txt"
+
 ### Arguments Checker
 
 while [ "$#" -gt 0 ];
@@ -17,10 +19,30 @@ do
         BUILD=false ;;
 
     -r|--run)
-        RUN=true ;;
+        RUN=true
+        if [ -n "$2" ]; then
+            case $2 in
+                -*) ;;
+                *) 
+                    FILE="$2"
+                    shift
+                    ;;
+            esac
+        fi
+        ;;
 
     -v|--valgrind)
-        VALGRIND=true ;;
+        VALGRIND=true
+        if [ -n "$2" ]; then
+            case $2 in
+                -*) ;; 
+                *) 
+                    FILE="$2"
+                    shift
+                    ;;
+            esac
+        fi
+        ;;
 
     *)
         echo "Invalid option: $1"
@@ -51,12 +73,12 @@ fi
 
 if [ "${RUN}" = true ]
 then
-    echo "Running..."
-    build/syllogist arguments.txt
+    echo "Running on ${FILE}..."
+    build/syllogist "${FILE}"
 fi
 
 if [ "${VALGRIND}" = true ]
 then
-    echo "Memory Check..."
-    valgrind build/syllogist arguments.txt
+    echo "Memory Check on ${FILE}..."
+    valgrind build/syllogist "${FILE}"
 fi
