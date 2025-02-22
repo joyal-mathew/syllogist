@@ -21,15 +21,15 @@ int main(int argc, char **argv) {
     }
 
     expressions[expressions.size()-1]->negate();
-    
+
     std::pair<TruthNode *, int> truth_tree = compute_truth_tree(expressions);
+
+    export_truth_tree_to_dot(truth_tree.first);
 
     for (Expr *e: expressions) {
         std::cout << *e << "\n";
         delete e;
     }
-    
-    // Add a way to print truth trees?
 
     delete_truth_tree(truth_tree.first);
 

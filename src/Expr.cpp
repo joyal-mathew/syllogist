@@ -62,12 +62,17 @@ Expr *Expr::get_unnegation() const {
     return expr;
 }
 
-std::pair<Expr *, Expr *> Expr::decompose() const {
+ExprType::ExprType Expr::get_unnegation_type() const {
+    DEBUG_ASSERT(type == ExprType::Negation);
+    return std::get<1>(data)->type;
+}
+
+std::pair<Expr, Expr> Expr::decompose() const {
     using namespace ExprType;
     DEBUG_ASSERT(type == Conjunction || type == Disjunction ||
                  type == Conditional || type == Biconditional);
-    Expr *lhs = new Expr(*std::get<0>(data).first);
-    Expr *rhs = new Expr(*std::get<0>(data).second);
+    Expr lhs = Expr(*std::get<0>(data).first);
+    Expr rhs = Expr(*std::get<0>(data).second);
     return std::make_pair(lhs, rhs);
 }
 
