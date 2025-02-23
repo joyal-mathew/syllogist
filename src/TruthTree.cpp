@@ -259,27 +259,23 @@ std::pair<TruthNode *, int> compute_truth_tree(std::vector<Expr *> premises){
 
     while (!unexpanded.empty()){
         std::pair<TruthNode *, DecompositionRule::DecompositionRule> decompose = get_next_decomposition(unexpanded);
-        std::pair<TruthNode *, TruthNode *> decomposed_children = get_decomposition_children(decompose.first, decompose.second);
         std::vector<TruthNode *> leaves = get_leaves(decompose.first);
         for (uint i = 0; i < leaves.size(); i++) {
-            TruthNode *first_child_copy = (decomposed_children.first) ? new TruthNode(*decomposed_children.first) : nullptr;
-            TruthNode *second_child_copy = (decomposed_children.second) ? new TruthNode(*decomposed_children.second) : nullptr;
-            add_child(leaves[i], first_child_copy, second_child_copy);
-            if (first_child_copy != nullptr) {
-                if (decomposable(first_child_copy))
-                    unexpanded.push_back(first_child_copy);
-                if (decomposable(first_child_copy->children.first))
-                    unexpanded.push_back(first_child_copy->children.first);
+            std::pair<TruthNode *, TruthNode *> decomposed_children = get_decomposition_children(decompose.first, decompose.second);
+            add_child(leaves[i], decomposed_children.first, decomposed_children.second);
+            if (decomposed_children.first != nullptr) {
+                if (decomposable(decomposed_children.first))
+                    unexpanded.push_back(decomposed_children.first);
+                if (decomposable(decomposed_children.first->children.first))
+                    unexpanded.push_back(decomposed_children.first->children.first);
             }
-            if (second_child_copy != nullptr) {
-                if (decomposable(second_child_copy))
-                    unexpanded.push_back(second_child_copy);
-                if (decomposable(second_child_copy->children.first))
-                    unexpanded.push_back(second_child_copy->children.first);
+            if (decomposed_children.second != nullptr) {
+                if (decomposable(decomposed_children.second))
+                    unexpanded.push_back(decomposed_children.second);
+                if (decomposable(decomposed_children.second->children.first))
+                    unexpanded.push_back(decomposed_children.second->children.first);
             }
         }
-        delete_truth_tree(decomposed_children.first); // Also deletes children
-        delete_truth_tree(decomposed_children.second);
     }
 
     return std::pair<TruthNode *, int>{root, premises.size()};
