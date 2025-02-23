@@ -6,7 +6,10 @@
 #include <fstream>
 #include <sstream>
 
-// Forward Declarations
+//--------------------------------//
+//----- Forward Declarations -----//
+//--------------------------------//
+
 bool decomposable(TruthNode *node);
 void add_child(TruthNode *node, TruthNode *lhs, TruthNode *rhs);
 std::vector<TruthNode *> get_leaves(TruthNode *node);
@@ -15,7 +18,16 @@ bool is_valid(TruthNode *root);
 std::pair<TruthNode *, DecompositionRule::DecompositionRule> get_next_decomposition(std::list<TruthNode *> &list);
 std::pair<TruthNode *, TruthNode *> get_decomposition_children(TruthNode *node, DecompositionRule::DecompositionRule rule);
 
-// Checks if expression is decomposable
+//--------------------------------//
+//----- Truth Tree Functions -----//
+//--------------------------------//
+
+/**
+ * @brief Checks if a node is decomposable
+ * @param node The node
+ * @return true If node is decomposable
+ * @return false If node is not decomposable
+ */
 bool decomposable(TruthNode *node) {
     if (node == nullptr)
         return false;
@@ -29,13 +41,22 @@ bool decomposable(TruthNode *node) {
     return true;
 }
 
-// Adds children to a node
+/**
+ * @brief Adds a left and right child to a parent node
+ * @param node The node
+ * @param lhs Left child
+ * @param rhs Right child
+ */
 void add_child(TruthNode *node, TruthNode *lhs, TruthNode *rhs) {
     node->children.first = lhs;
     node->children.second = rhs;
 }
 
-// Gets the leaves of a node
+/**
+ * @brief Gets the leaves of a node
+ * @param node The starting node
+ * @return std::vector<TruthNode *> 
+ */
 std::vector<TruthNode *> get_leaves(TruthNode *node) {
     if (node == nullptr)
         return std::vector<TruthNode *>();
@@ -50,13 +71,23 @@ std::vector<TruthNode *> get_leaves(TruthNode *node) {
     return lhs;
 }
 
-// Check for closures on branches
-void closure_check(TruthNode *root, std::vector<Expr> seen) {
+//! This function is not done yet
+/**
+ * @brief Check for closures on branches
+ * @param root The root of the truth tree
+ * @param seen List of seen atoms
+ */
+void closure_check(TruthNode *root, std::vector<Expr> seen = std::vector<Expr>()) {
     root = root;
     seen = seen;
 }
 
-// Check all branches end in a closure
+/**
+ * @brief Checks that all branches end in a closure
+ * @param root Root of the truth tree
+ * @return true When all branches end with a contradiction
+ * @return false When there exist at least one open branch
+ */
 bool is_valid(TruthNode *root) {
     std::vector<TruthNode *> leaves = get_leaves(root);
     for (uint i = 0; i < leaves.size(); i++) {
@@ -66,7 +97,11 @@ bool is_valid(TruthNode *root) {
     return true;
 }
 
-// Returns next decomposition node and rule. Also removes from list.
+/**
+ * @brief Returns next decomposition node and rule from unexpanded node list.
+ * @param list List of unexpanded truth nodes (modified)
+ * @return std::pair<TruthNode *, DecompositionRule::DecompositionRule> 
+ */
 std::pair<TruthNode *, DecompositionRule::DecompositionRule> get_next_decomposition(std::list<TruthNode *> &list){
     TruthNode *node = nullptr;
     DecompositionRule::DecompositionRule rule = DecompositionRule::Assume; // Assume is used as a null
@@ -139,7 +174,12 @@ std::pair<TruthNode *, DecompositionRule::DecompositionRule> get_next_decomposit
     return std::pair<TruthNode *, DecompositionRule::DecompositionRule>{node, rule};
 }
 
-//Returns the children of a node and decomposition rule applied to it.
+/**
+ * @brief Returns the children of a node and decomposition rule applied to it.
+ * @param node The node being decomposed
+ * @param rule The decomposition rule
+ * @return std::pair<TruthNode *, TruthNode *> 
+ */
 std::pair<TruthNode *, TruthNode *> get_decomposition_children(TruthNode *node, DecompositionRule::DecompositionRule rule) {
     //! Good chance this function causes a bunch of memory leaks
     TruthNode *lhs = nullptr;
@@ -231,6 +271,10 @@ std::pair<TruthNode *, TruthNode *> get_decomposition_children(TruthNode *node, 
     return std::pair<TruthNode *, TruthNode *>{lhs, rhs};
 }
 
+/**
+ * @brief Deletes a truth tree
+ * @param root The starting node
+ */
 void delete_truth_tree(TruthNode *root) {
     if (root == nullptr)
         return;
@@ -239,6 +283,11 @@ void delete_truth_tree(TruthNode *root) {
     delete root;
 }
 
+/**
+ * @brief Creates a truth tree from a list of premises
+ * @param premises List of premises
+ * @return std::pair<TruthNode *, int> 
+ */
 std::pair<TruthNode *, int> compute_truth_tree(std::vector<Expr *> premises){
     std::list<TruthNode *> unexpanded;
     TruthNode *root = new TruthNode(Expr(*premises[0]), DecompositionRule::Assume);
@@ -257,6 +306,7 @@ std::pair<TruthNode *, int> compute_truth_tree(std::vector<Expr *> premises){
         i++;
     }
 
+    // Handle all unexpanded nodes
     while (!unexpanded.empty()){
         std::pair<TruthNode *, DecompositionRule::DecompositionRule> decompose = get_next_decomposition(unexpanded);
         std::vector<TruthNode *> leaves = get_leaves(decompose.first);
@@ -276,22 +326,25 @@ std::pair<TruthNode *, int> compute_truth_tree(std::vector<Expr *> premises){
                     unexpanded.push_back(decomposed_children.second->children.first);
             }
         }
+        closure_check(root); //! This function is not implemented yet
     }
 
+    //* Uncomment when closure check is complete
+    // if (!is_valid(root))
+    //     return std::pair<TruthNode *, int>{nullptr, 0};
     return std::pair<TruthNode *, int>{root, premises.size()};
-    
-    // Check list in order of stacks then branches
-    // decompose first stack, if none then first branch
-    // call get leaves to then create new nodes at the leaves and add to list, remove current from list
-    // check for closures
-    // repeat above block until unexpanded is empty
-    // Check for open branches
 }
 
 //--------------------------------//
 //----- Exporting Truth Tree -----//
 //--------------------------------//
 
+/**
+ * @brief Writes a truth tree node as a vertex and calls its children as edges
+ * @param out The file being written to
+ * @param node The truth tree node
+ * @param show_refs Optional parameter for displaying reference edges
+ */
 void write_dot_node(std::ofstream &out, TruthNode *node, bool show_refs = false) {
     if (node == nullptr) return;
     std::stringstream label;
@@ -311,7 +364,6 @@ void write_dot_node(std::ofstream &out, TruthNode *node, bool show_refs = false)
         out << "    \"" << node << "\" -> \"" << node->children.second << "\";\n";
         write_dot_node(out, node->children.second);
     }
-    //show_refs = true; // For debugging...
     if (show_refs){
         if (node->references.first != nullptr) {
             out << "    \"" << node << "\" -> \"" << node->references.first << "\" [style=\"dashed\"];\n";
@@ -322,7 +374,12 @@ void write_dot_node(std::ofstream &out, TruthNode *node, bool show_refs = false)
     }
 }
 
-void export_truth_tree_to_dot(TruthNode *root) {
+/**
+ * @brief Write a truth tree as a dot file, written to build/truth_tree.dot
+ * @param root The root of the truth tree
+ * @param show_refs Optional parameter for displaying reference edges
+ */
+void export_truth_tree_to_dot(TruthNode *root, bool show_refs = false) {
     const std::string filename = "build/truth_tree.dot";
     std::ofstream out(filename);
     if (!out) {
