@@ -28,7 +28,7 @@ namespace InferenceRule {
 struct Step {
     Expr expr;
     InferenceRule::InferenceRule rule;
-    std::vector<Step *> citations;
+    std::vector<Step *> references;
     std::optional<std::vector<Step>> subproof;
 };
 

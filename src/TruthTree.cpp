@@ -345,7 +345,7 @@ std::pair<TruthNode *, int> compute_truth_tree(std::vector<Expr *> premises){
  * @param node The truth tree node
  * @param show_refs Optional parameter for displaying reference edges
  */
-void write_dot_node(std::ofstream &out, TruthNode *node, bool show_refs = false) {
+void write_dot_node(std::ofstream &out, TruthNode *node, bool show_refs) {
     if (node == nullptr) return;
     std::stringstream label;
     label << node->expr;
@@ -358,13 +358,13 @@ void write_dot_node(std::ofstream &out, TruthNode *node, bool show_refs = false)
     out << "    \"" << node << "\" [label=\"" << label_str << "\"];\n";
     if (node->children.first != nullptr) {
         out << "    \"" << node << "\" -> \"" << node->children.first << "\";\n";
-        write_dot_node(out, node->children.first);
+        write_dot_node(out, node->children.first, show_refs);
     }
     if (node->children.second != nullptr) {
         out << "    \"" << node << "\" -> \"" << node->children.second << "\";\n";
-        write_dot_node(out, node->children.second);
+        write_dot_node(out, node->children.second, show_refs);
     }
-    if (show_refs){
+    if(show_refs){
         if (node->references.first != nullptr) {
             out << "    \"" << node << "\" -> \"" << node->references.first << "\" [style=\"dashed\"];\n";
         }
@@ -379,7 +379,7 @@ void write_dot_node(std::ofstream &out, TruthNode *node, bool show_refs = false)
  * @param root The root of the truth tree
  * @param show_refs Optional parameter for displaying reference edges
  */
-void export_truth_tree_to_dot(TruthNode *root, bool show_refs = false) {
+void export_truth_tree_to_dot(TruthNode *root, bool show_refs) {
     const std::string filename = "build/truth_tree.dot";
     std::ofstream out(filename);
     if (!out) {
@@ -389,7 +389,7 @@ void export_truth_tree_to_dot(TruthNode *root, bool show_refs = false) {
     out << "digraph TruthTree {\n";
     out << "    rankdir=TB;\n";
     out << "    node [shape=ellipse];\n";
-    write_dot_node(out, root); 
+    write_dot_node(out, root, show_refs); 
     out << "}\n";
     out.close();
 }

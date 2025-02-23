@@ -32,6 +32,6 @@ struct TruthNode {
         : expr(e), rule(d), children({nullptr, nullptr}), references({r, nullptr}) {}
 };
 
-void export_truth_tree_to_dot(TruthNode *root);
+void export_truth_tree_to_dot(TruthNode *root, bool show_refs = false);
 void delete_truth_tree(TruthNode *root);
 std::pair<TruthNode *, int> compute_truth_tree(std::vector<Expr *> premises);
