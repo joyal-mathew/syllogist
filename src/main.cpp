@@ -26,6 +26,11 @@ int main(int argc, char **argv) {
 
     export_truth_tree_to_dot(truth_tree.first);
 
+    if (truth_tree.first)
+        std::cout << "Argument is valid\n";
+    else
+        std::cout << "Argument is invalid\n";
+
     for (Expr *e: expressions) {
         std::cout << *e << "\n";
         delete e;

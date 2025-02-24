@@ -35,6 +35,14 @@ Expr::~Expr() {
     }
 }
 
+u16 Expr::get_atom() const {
+    if (type == ExprType::Atom)
+        return std::get<2>(data);
+    if (type == ExprType::Negation)
+        return std::get<1>(data)->get_atom();
+    DEBUG_ASSERT(false);
+}
+
 void Expr::negate() {
     Expr *oprand = new Expr(type, data);
     type = ExprType::Negation;
