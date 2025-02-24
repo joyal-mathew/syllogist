@@ -43,6 +43,7 @@ public:
     Expr(const Expr &expr);
     ~Expr();
 
+    u16 get_atom() const;
     void negate();
     void unnegate();
     Expr *get_negation() const;

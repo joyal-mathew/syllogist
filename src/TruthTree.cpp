@@ -2,6 +2,7 @@
 #include "Expr.hpp"
 #include "errors.hpp"
 #include <list>
+#include <unordered_map>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -71,15 +72,41 @@ std::vector<TruthNode *> get_leaves(TruthNode *node) {
     return lhs;
 }
 
-//! This function is not done yet
 /**
  * @brief Check for closures on branches
  * @param root The root of the truth tree
  * @param seen List of seen atoms
  */
-void closure_check(TruthNode *root, std::vector<Expr> seen = std::vector<Expr>()) {
-    root = root;
-    seen = seen;
+void closure_check(TruthNode *root, std::unordered_map<u16, TruthNode*> seen = std::unordered_map<u16, TruthNode*>()) {
+    if (root == nullptr)
+        return;
+    bool isAtom = false;
+    bool isNegated = false;
+    switch (root->expr.type) {
+        case ExprType::Atom:
+            isAtom = true;
+            break;
+        case ExprType::Negation:
+            isAtom = (root->expr.get_unnegation_type() == ExprType::Atom);
+            isNegated = true;
+            break;
+    default:
+        break;
+    }
+    if (isAtom) {
+        u16 atom = root->expr.get_atom();
+        if (isNegated)
+            atom *= -1;
+        if (seen.count(atom * -1)) {
+            TruthNode *con = new TruthNode(Expr(ExprType::Contradiction), DecompositionRule::Closure);
+            con->references = {seen.at(atom * -1), root};
+            add_child(root, con, nullptr);
+            return;
+        }
+        seen.emplace(atom, root);
+    }
+    closure_check(root->children.first, seen);
+    closure_check(root->children.second, seen);
 }
 
 /**
@@ -326,12 +353,11 @@ std::pair<TruthNode *, int> compute_truth_tree(std::vector<Expr *> premises){
                     unexpanded.push_back(decomposed_children.second->children.first);
             }
         }
-        closure_check(root); //! This function is not implemented yet
+        closure_check(root);
     }
 
-    //* Uncomment when closure check is complete
-    // if (!is_valid(root))
-    //     return std::pair<TruthNode *, int>{nullptr, 0};
+    if (!is_valid(root))
+        return std::pair<TruthNode *, int>{nullptr, 0};
     return std::pair<TruthNode *, int>{root, premises.size()};
 }
 
