@@ -29,9 +29,12 @@ struct Step {
     InferenceRule::InferenceRule rule;
     std::optional<std::vector<Step *>> references;
     std::optional<std::vector<Step>> subproof;
-    TruthNode(Expr e,InferenceRule::InferenceRule i)
-        : expr(e), rule(i), references(), subproof(){}
-    
+
+    Step(Expr e)
+        : expr(e), rule(InferenceRule::Assume), references(), subproof(){}
+
+    Step(Expr e, InferenceRule::InferenceRule r, std::vector<Step *> ref)
+        : expr(e), rule(r), references(ref), subproof(){}
 };
 
 struct Proof {
