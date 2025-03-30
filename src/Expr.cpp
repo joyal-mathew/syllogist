@@ -84,6 +84,26 @@ std::pair<Expr, Expr> Expr::decompose() const {
     return std::make_pair(lhs, rhs);
 }
 
+std::string Expr::to_string() {
+    switch (type) {
+        case ExprType::Atom:
+            return std::string(1, std::get<2>(data));
+        case ExprType::Contradiction:
+            return "⊥";
+        case ExprType::Negation:
+            return "¬("+std::get<1>(data)->to_string()+")";
+        case ExprType::Conjunction:
+            return "("+std::get<0>(data).first->to_string()+"∧"+std::get<0>(data).second->to_string()+")";
+        case ExprType::Disjunction:
+            return "("+std::get<0>(data).first->to_string()+"∨"+std::get<0>(data).second->to_string()+")";
+        case ExprType::Conditional:
+            return "("+std::get<0>(data).first->to_string()+"→"+std::get<0>(data).second->to_string()+")";
+        case ExprType::Biconditional:
+            return "("+std::get<0>(data).first->to_string()+"↔"+std::get<0>(data).second->to_string()+")";
+    }
+    return "";
+}
+
 struct BinaryOperatorEntry {
     ExprType::ExprType op;
     const char *word;
