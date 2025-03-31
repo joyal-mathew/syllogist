@@ -11,6 +11,8 @@ Expr::Expr(const Expr &expr) {
         break;
     case ExprType::Contradiction:
         break;
+    case ExprType::Open_Branch:
+        break;
     case ExprType::Negation:
         data = new Expr(*std::get<1>(expr.data));
         break;
@@ -125,6 +127,9 @@ std::ostream &operator<<(std::ostream &out, const Expr &expr) {
         break;
     case ExprType::Contradiction:
         out << '?';
+        break;
+    case ExprType::Open_Branch:
+        out << '!';
         break;
     case ExprType::Negation:
         out << "(not " << *std::get<1>(expr.data) << ')';

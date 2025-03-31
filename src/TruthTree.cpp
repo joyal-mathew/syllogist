@@ -1,6 +1,7 @@
 #include "TruthTree.hpp"
 #include "Expr.hpp"
 #include "errors.hpp"
+#include "willow.hpp"
 #include <list>
 #include <unordered_map>
 #include <iostream>
@@ -350,10 +351,12 @@ std::pair<TruthNode *, int> compute_truth_tree(std::vector<Expr *> premises){
     }
     closure_check(root);
 
-    if (!is_valid(root)) {
+    if (!is_valid(root)){
+        to_willow(root, premises.size());
         delete_truth_tree(root);
         return std::pair<TruthNode *, int>{nullptr, 0};
     }
+
     return std::pair<TruthNode *, int>{root, premises.size()};
 }
 

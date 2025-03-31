@@ -11,6 +11,7 @@ namespace ExprType {
     enum ExprType {
         Atom,
         Contradiction,
+        Open_Branch,
         Negation,
         Conjunction,
         Disjunction,
