@@ -98,6 +98,8 @@ void closure_check(TruthNode *root, std::unordered_map<u16, TruthNode*> seen = s
         if (isNegated)
             atom *= -1;
         if (seen.count(atom * -1)) {
+            delete_truth_tree(root->children.first);
+            delete_truth_tree(root->children.second);
             TruthNode *con = new TruthNode(Expr(ExprType::Contradiction), DecompositionRule::Closure);
             con->references = {seen.at(atom * -1), root};
             add_child(root, con, nullptr);
@@ -265,31 +267,23 @@ std::pair<TruthNode *, TruthNode *> get_decomposition_children(TruthNode *node, 
             break; }
         case DecompositionRule::Biconditional: {
             std::pair<Expr, Expr> decomposed = node->expr.decompose();
+            Expr *first_copy = new Expr(decomposed.first);
+            Expr *second_copy = new Expr(decomposed.second);
             Expr *negated_lhs = decomposed.first.get_negation();
             Expr *negated_rhs = decomposed.second.get_negation();
-            lhs = new TruthNode(decomposed.first, rule, node);
-            TruthNode *lhs2 = new TruthNode(decomposed.second, rule, node);
-            add_child(lhs, lhs2, nullptr);
-            rhs = new TruthNode(*negated_lhs, rule, node);
-            TruthNode *rhs2 = new TruthNode(*negated_rhs, rule, node);
-            add_child(rhs, rhs2, nullptr);
-            delete negated_lhs;
-            delete negated_rhs;
+            lhs = new TruthNode(Expr(ExprType::Conjunction, first_copy, second_copy), rule, node);
+            rhs = new TruthNode(Expr(ExprType::Conjunction, negated_lhs, negated_rhs), rule, node);
             break; }
         case DecompositionRule::NegatedBiconditional: {
             Expr *unnegated = node->expr.get_unnegation();
             std::pair<Expr, Expr> decomposed = unnegated->decompose();
+            Expr *first_copy = new Expr(decomposed.first);
+            Expr *second_copy = new Expr(decomposed.second);
             Expr *negated_lhs = decomposed.first.get_negation();
             Expr *negated_rhs = decomposed.second.get_negation();
-            lhs = new TruthNode(decomposed.first, rule, node);
-            TruthNode *lhs2 = new TruthNode(*negated_rhs, rule, node);
-            add_child(lhs, lhs2, nullptr);
-            rhs = new TruthNode(*negated_lhs, rule, node);
-            TruthNode *rhs2 = new TruthNode(decomposed.second, rule, node);
-            add_child(rhs, rhs2, nullptr);
+            lhs = new TruthNode(Expr(ExprType::Conjunction, first_copy, negated_rhs), rule, node);
+            rhs = new TruthNode(Expr(ExprType::Conjunction, negated_lhs, second_copy), rule, node);
             delete unnegated;
-            delete negated_lhs;
-            delete negated_rhs;
             break; }
         default:
             break;
@@ -353,11 +347,13 @@ std::pair<TruthNode *, int> compute_truth_tree(std::vector<Expr *> premises){
                     unexpanded.push_back(decomposed_children.second->children.first);
             }
         }
-        closure_check(root);
     }
+    closure_check(root);
 
-    if (!is_valid(root))
+    if (!is_valid(root)) {
+        delete_truth_tree(root);
         return std::pair<TruthNode *, int>{nullptr, 0};
+    }
     return std::pair<TruthNode *, int>{root, premises.size()};
 }
 
