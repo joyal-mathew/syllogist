@@ -351,6 +351,8 @@ std::pair<TruthNode *, int> compute_truth_tree(std::vector<Expr *> premises){
     }
     closure_check(root);
 
+    export_truth_tree_to_dot(root);
+
     if (!is_valid(root)){
         to_willow(root, premises.size());
         delete_truth_tree(root);

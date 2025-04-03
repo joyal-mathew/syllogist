@@ -17,6 +17,8 @@ struct node {
     int antecedent;
     int parent;
 
+    node(int id_, std::string text_, bool premise_)
+        : id(id_), text(text_), premise(premise_) {}
     node(int id_, std::string text_, bool premise_, int parent_)
         : id(id_), text(text_), premise(premise_), parent(parent_) {}
 };
