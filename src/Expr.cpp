@@ -86,7 +86,7 @@ std::pair<Expr, Expr> Expr::decompose() const {
     return std::make_pair(lhs, rhs);
 }
 
-std::string Expr::to_string(bool willow) {
+std::string Expr::to_string(bool willow = false) {
     switch (type) {
         case ExprType::Atom:
             return std::string(1, std::get<2>(data));

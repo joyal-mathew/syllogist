@@ -52,7 +52,7 @@ public:
     ExprType::ExprType get_unnegation_type() const;
     std::pair<Expr, Expr> decompose() const;
 
-    std::string to_string(bool willow);
+    std::string to_string(bool willow = false);
     friend std::ostream &operator<<(std::ostream &out, const Expr &expr);
 };
 
