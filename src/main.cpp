@@ -24,8 +24,6 @@ int main(int argc, char **argv) {
 
     std::pair<TruthNode *, int> truth_tree = compute_truth_tree(expressions);
 
-    //export_truth_tree_to_dot(truth_tree.first);
-
     if (truth_tree.first)
         std::cout << "Argument is valid\n";
     else

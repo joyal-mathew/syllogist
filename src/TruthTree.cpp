@@ -16,6 +16,7 @@ bool decomposable(TruthNode *node);
 void add_child(TruthNode *node, TruthNode *lhs, TruthNode *rhs);
 std::vector<TruthNode *> get_leaves(TruthNode *node);
 void closure_check(TruthNode *root, std::vector<Expr> seen);
+void open_branch(TruthNode* root);
 bool is_valid(TruthNode *root);
 std::pair<TruthNode *, DecompositionRule::DecompositionRule> get_next_decomposition(std::list<TruthNode *> &list);
 std::pair<TruthNode *, TruthNode *> get_decomposition_children(TruthNode *node, DecompositionRule::DecompositionRule rule);
@@ -110,6 +111,20 @@ void closure_check(TruthNode *root, std::unordered_map<u16, TruthNode*> seen = s
     }
     closure_check(root->children.first, seen);
     closure_check(root->children.second, seen);
+}
+
+/**
+ * @brief Adds open branch node to all open branches
+ * @param root Root of the truth tree
+ */
+void open_branch(TruthNode* root) {
+    std::vector<TruthNode *> leaves = get_leaves(root);
+    for (uint i = 0; i < leaves.size(); i++) {
+        if (leaves[i]->expr.type != ExprType::Contradiction) {
+            TruthNode* open_branch = new TruthNode(Expr(ExprType::Open_Branch), DecompositionRule::Closure);
+            add_child(leaves[i], open_branch, nullptr);
+        }
+    }
 }
 
 /**
@@ -354,6 +369,7 @@ std::pair<TruthNode *, int> compute_truth_tree(std::vector<Expr *> premises){
     export_truth_tree_to_dot(root);
 
     if (!is_valid(root)){
+        open_branch(root);
         to_willow(root, premises.size());
         delete_truth_tree(root);
         return std::pair<TruthNode *, int>{nullptr, 0};
@@ -374,9 +390,7 @@ std::pair<TruthNode *, int> compute_truth_tree(std::vector<Expr *> premises){
  */
 void write_dot_node(std::ofstream &out, TruthNode *node, bool show_refs) {
     if (node == nullptr) return;
-    std::stringstream label;
-    label << node->expr;
-    std::string label_str = label.str();
+    std::string label_str = node->expr.to_string();
     size_t pos = 0;
     while ((pos = label_str.find('"', pos)) != std::string::npos) {
         label_str.insert(pos, "\\");

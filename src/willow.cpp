@@ -14,14 +14,11 @@ void to_json(json& j, const node& node) {
         {"decomposition", node.decomposition},
         {"premise", node.premise},
         {"parent", (node.parent == -1) ? json(nullptr) : json(node.parent)},
-        {"antecedent", (node.premise || node.antecedent == -1) ? json(nullptr) : json(node.antecedent)}
+        {"antecedent", (node.antecedent == -1) ? json(nullptr) : json(node.antecedent)}
     };
 }
 
 void to_willow(TruthNode* root, int premise_count) {
-    (void) root;
-    (void) premise_count;
-
     std::unordered_map<TruthNode*, int> node_map;
     std::vector<node> nodes;
 
@@ -32,17 +29,21 @@ void to_willow(TruthNode* root, int premise_count) {
     int cur_id = 0;
     TruthNode* cur_node = root;
     for (int i = 0; i < premise_count; i++) {
-        nodes.push_back(node(cur_id, cur_node->expr.to_string(true), true, cur_id-1));
+        nodes.push_back(node(cur_id, cur_node->expr.to_string(true), true, cur_id-1, -1));
         node_map.emplace(cur_node, cur_id);
         cur_id++;
-        cur_node = cur_node->children.first;
+        if (i != premise_count - 1)
+            cur_node = cur_node->children.first;
     }
 
     // BFS to construct nodes and add them to map
     std::queue<TruthNode*> q;
-    q.push(cur_node);
+    if (cur_node->children.first)
+        q.push(cur_node->children.first);
+    if (cur_node->children.second)
+        q.push(cur_node->children.second);
     while (!q.empty()) {
-        TruthNode* cur_node = q.front();
+        cur_node = q.front();
         q.pop();
         if (cur_node->children.first)
             q.push(cur_node->children.first);
@@ -93,6 +94,6 @@ void to_willow(TruthNode* root, int premise_count) {
     // Write json file
     std::ofstream file;
     file.open("build/willow.willow");
-    file << j.dump(4);
+    file << j.dump(2);
     file.close();
 }

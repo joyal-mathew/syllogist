@@ -26,6 +26,7 @@ Expr::Expr(const Expr &expr) {
 Expr::~Expr() {
     switch (type) {
     case ExprType::Atom:
+    case ExprType::Open_Branch:
     case ExprType::Contradiction:
         break;
     case ExprType::Negation:
