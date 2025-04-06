@@ -9,9 +9,9 @@
 
 namespace ExprType {
     enum ExprType {
-        Atom,
-        Contradiction,
-        Negation,
+        Atom, //dont use decompose
+        Contradiction, //dont use decompose
+        Negation, //dont use decompose
         Conjunction,
         Disjunction,
         Conditional,
