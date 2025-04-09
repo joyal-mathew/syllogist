@@ -2,6 +2,7 @@
 #include "TruthTree.hpp"
 #include "unordered_map"
 #include <optional>
+#include <iostream>
 
 
 typedef std::pair<std::vector<Step>*,int> StepLoc;
@@ -20,12 +21,14 @@ void condR(TruthNode* assume, std::vector<Step> *proof);
 void ncondR(TruthNode* assume, std::vector<Step> *proof);
 void bcondR(TruthNode* assume, std::vector<Step> *proof);
 void nbcondR(TruthNode* assume, std::vector<Step> *proof);
-void closeR(TruthNode* assume, std::vector<Step> *proof);
+//void closeR(TruthNode* assume, std::vector<Step> *proof);
 void checkNode(TruthNode* tnode, std::vector<Step> *proof);
 
 //--------------------------------//
 //------- Proof Functions --------//
 //--------------------------------//
+
+// The lines are seperations for different layers
 void dnR(TruthNode* assume, std::vector<Step> *proof){
     proof->push_back(Step(*assume->expr.get_unnegation(),InferenceRule::NegationElimination,mapping.at(assume)));
     mapping.at(assume) = StepLoc{proof,proof->size()-1};
@@ -37,6 +40,7 @@ void dnR(TruthNode* assume, std::vector<Step> *proof){
 //     proof->push_back( Step(decomposed.second,InferenceRule::ConjunctionElimination,mapping.at(assume)));
 // }
 
+// Negated Conjunction Rule Truthtree to Proof
 void nconR(TruthNode* assume, std::vector<Step> *proof){
     std::pair<Expr, Expr> decomposed = assume->expr.get_unnegation()->decompose();
     Expr *first_copy = new Expr(decomposed.first);
@@ -127,6 +131,7 @@ void nconR(TruthNode* assume, std::vector<Step> *proof){
     mapping.at(assume) = StepLoc{proof,proof->size()-1};
 }
 
+// Negated Disjunction Rule Truthtree to Proof
 
 void ndisR(TruthNode* assume, std::vector<Step> *proof){
     std::pair<Expr, Expr> decomposed = assume->expr.get_unnegation()->decompose();
@@ -182,6 +187,9 @@ void ndisR(TruthNode* assume, std::vector<Step> *proof){
     proof->at(proof->size()-1).references.value().push_back(StepLoc{proof,proof->size()-2});
     mapping.at(assume) = StepLoc{proof,proof->size()-1};
 }
+
+
+// Conditionals Truthtree to Proof
 
 void condR(TruthNode* assume, std::vector<Step> *proof){
     std::pair<Expr, Expr> decomposed = assume->expr.decompose();
@@ -298,6 +306,8 @@ void condR(TruthNode* assume, std::vector<Step> *proof){
     mapping.at(assume) = StepLoc{proof,proof->size()-1};
 }
 
+// negated conditional Rule Truthtree to Proof
+
 void ncondR(TruthNode* assume, std::vector<Step> *proof){
     std::pair<Expr, Expr> decomposed = (*assume->expr.get_unnegation()).decompose();
     Expr *first_copy = new Expr(decomposed.first);
@@ -366,12 +376,12 @@ void ncondR(TruthNode* assume, std::vector<Step> *proof){
     mapping.at(assume) = StepLoc{proof,proof->size()-1};
 }
 
+// Biconditional Rule Truthtree to Proof
+
 void bcondR(TruthNode* assume, std::vector<Step> *proof){
     std::pair<Expr, Expr> decomposed = assume->expr.decompose();
-    Expr *first_copy = new Expr(decomposed.first);
-    Expr *second_copy = new Expr(decomposed.second);
     Expr goal =  Expr(ExprType::Disjunction,
-        first_copy,
+        new Expr(decomposed.first),
         decomposed.first.get_negation());
         
     Step second_assume = Step(*goal.get_negation());
@@ -421,13 +431,13 @@ void bcondR(TruthNode* assume, std::vector<Step> *proof){
         InferenceRule::NegationElimination,
         StepLoc{proof,proof->size()-1}
     )); 
-    Expr* goal_L = new Expr(ExprType::Conjunction,
-        first_copy,
-        second_copy
+    Expr *goal_L = new Expr(ExprType::Conjunction,
+        new Expr(decomposed.first),
+        new Expr(decomposed.second)
     );
     Expr* goal_R = new Expr(ExprType::Conjunction,
-        first_copy,
-        second_copy
+        decomposed.first.get_unnegation(),
+        decomposed.second.get_negation()
     );
     Expr goal = Expr (
         ExprType::Disjunction,
@@ -445,7 +455,7 @@ void bcondR(TruthNode* assume, std::vector<Step> *proof){
         ));
         second_layer->at(second_layer->size()-1).references.value().push_back(StepLoc{proof,proof->size()-1});
         second_layer->push_back(Step(
-            Expr(ExprType::Conjunction, first_copy,second_copy),
+            Expr(ExprType::Conjunction, new Expr(decomposed.first),new Expr(decomposed.second)),
             InferenceRule::ConjunctionIntroduction,
             StepLoc{proof,proof->size()-1}
         ));
@@ -503,6 +513,8 @@ void bcondR(TruthNode* assume, std::vector<Step> *proof){
     proof->at(proof->size()-1).references.value().push_back(StepLoc{proof,proof->size()-2});
     mapping.at(assume) = StepLoc{proof,proof->size()-1};
 }
+
+// Negated Bicondition Rule Truthtree to Proof
 
 void nbcondR(TruthNode* assume, std::vector<Step> *proof){
     std::pair<Expr, Expr> decomposed = (*assume->expr.get_unnegation()).decompose();
@@ -689,14 +701,56 @@ void checkNode(TruthNode *tnode, std::vector<Step> *proof){
                     mapping.at(tnode->references.first)
                 ));
                 proof->at(proof->size()-1).references.value().push_back(mapping.at(tnode->references.second));
-                break;
+                return;
             
             default:
                 break;
         }
        
     }
-    Step* curr = &(mapping.at(tnode).first->at(mapping.at(tnode).second));
+    ExprType::ExprType expr_rule = tnode->expr.type;
+    switch (expr_rule)
+    {
+        case ExprType::Conditional:
+        condR(tnode,proof);
+        break;
+
+        case ExprType::Biconditional:
+        bcondR(tnode,proof);
+        break;
+
+        case ExprType::Negation:
+        ExprType::ExprType neg_expr_rule = tnode->expr.get_unnegation_type();
+            switch (neg_expr_rule)
+            {
+                case ExprType::Conjunction:
+                nconR(tnode,proof);
+                break;
+        
+                case ExprType::Disjunction:
+                ndisR(tnode,proof);
+                break;
+        
+                case ExprType::Conditional:
+                ncondR(tnode,proof);
+                break;
+        
+                case ExprType::Biconditional:
+                nbcondR(tnode,proof);
+                break;
+            
+            default:
+                break;
+            }
+        break;
+
+    default:
+        break;
+    }
+
+    checkNode(tnode->children.first,proof);
+    if (tnode->children.second){checkNode(tnode->children.second,proof);}
+
 }
 
 Proof to_proof(std::pair<TruthNode *, int> tt){
