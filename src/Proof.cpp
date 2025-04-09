@@ -39,17 +39,19 @@ void dnR(TruthNode* assume, std::vector<Step> *proof){
 
 void nconR(TruthNode* assume, std::vector<Step> *proof){
     std::pair<Expr, Expr> decomposed = assume->expr.get_unnegation()->decompose();
+    Expr *first_copy = new Expr(decomposed.first);
+    Expr *second_copy = new Expr(decomposed.second);
     Expr goal =  Expr(ExprType::Disjunction,
                     decomposed.first.get_negation(),
                     decomposed.second.get_negation());
 
     Step second_assume = Step(*goal.get_negation());
     proof->push_back(second_assume);
-    std::vector<Step>* second_layer = &second_assume.subproof.value();
+    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof.value();
         //----------------------------------------------------------------
         Step third_assume = Step(*decomposed.first.get_negation());
         second_layer->push_back(third_assume);
-        std::vector<Step>* third_layer = &third_assume.subproof.value();
+        std::vector<Step>* third_layer = &second_layer->at(second_layer->size()-1).subproof.value();
             //----------------------------------------------------------------
             third_layer->push_back(Step(
                 goal,
@@ -75,7 +77,7 @@ void nconR(TruthNode* assume, std::vector<Step> *proof){
         ));
         third_assume = Step(*decomposed.second.get_negation());
         second_layer->push_back(third_assume);
-        third_layer = &third_assume.subproof.value();
+        third_layer = &second_layer->at(second_layer->size()-1).subproof.value();
             //----------------------------------------------------------------
             third_layer->push_back(Step(
                 goal,
@@ -100,7 +102,7 @@ void nconR(TruthNode* assume, std::vector<Step> *proof){
             StepLoc{second_layer,4}
         ));
         second_layer->push_back(Step(
-            Expr(ExprType::Disjunction,&decomposed.first,&decomposed.second),
+            Expr(ExprType::Disjunction,first_copy,second_copy),
             InferenceRule::ConjunctionIntroduction,
             StepLoc{second_layer,2}
         ));
@@ -130,7 +132,7 @@ void ndisR(TruthNode* assume, std::vector<Step> *proof){
     std::pair<Expr, Expr> decomposed = assume->expr.get_unnegation()->decompose();
     Step second_assume = Step(decomposed.first);
     proof->push_back(second_assume);
-    std::vector<Step>* second_layer = &second_assume.subproof.value();
+    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof.value();
         //----------------------------------------------------------------
         second_layer->push_back(Step(
             *assume->expr.get_unnegation(),
@@ -151,7 +153,7 @@ void ndisR(TruthNode* assume, std::vector<Step> *proof){
     ));
     second_assume = Step(decomposed.second);
     proof->push_back(second_assume);
-    second_layer = &second_assume.subproof.value();
+    second_layer = &proof->at(proof->size()-1).subproof.value();
         //----------------------------------------------------------------
         second_layer->push_back(Step(
             *assume->expr.get_unnegation(),
@@ -183,17 +185,19 @@ void ndisR(TruthNode* assume, std::vector<Step> *proof){
 
 void condR(TruthNode* assume, std::vector<Step> *proof){
     std::pair<Expr, Expr> decomposed = assume->expr.decompose();
+    Expr *first_copy = new Expr(decomposed.first);
+    Expr *second_copy = new Expr(decomposed.second);
     Expr goal =  Expr(ExprType::Disjunction,
-        &decomposed.first,
+        first_copy,
         decomposed.first.get_negation());
         
     Step second_assume = Step(*goal.get_negation());
     proof->push_back(second_assume);
-    std::vector<Step>* second_layer = &second_assume.subproof.value();
+    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof.value();
         //----------------------------------------------------------------
         Step third_assume = Step(decomposed.first);
         second_layer->push_back(third_assume);
-        std::vector<Step>* third_layer = &third_assume.subproof.value();
+        std::vector<Step>* third_layer = &second_layer->at(second_layer->size()-1).subproof.value();
             //----------------------------------------------------------------
             third_layer->push_back(Step(
                 goal,
@@ -236,14 +240,14 @@ void condR(TruthNode* assume, std::vector<Step> *proof){
     ));
     goal =  Expr(ExprType::Disjunction,
         decomposed.first.get_negation(),
-        &decomposed.second);
+        second_copy);
     second_assume = Step(*goal.get_negation());
     proof->push_back(second_assume);
-    second_layer = &second_assume.subproof.value();
+    second_layer = &proof->at(proof->size()-1).subproof.value();
         //----------------------------------------------------------------
         third_assume = Step(decomposed.first);
         second_layer->push_back(third_assume);
-        third_layer = &third_assume.subproof.value();
+         third_layer = &second_layer->at(second_layer->size()-1).subproof.value();
             //----------------------------------------------------------------
             third_layer->push_back(Step(
                 decomposed.second,
@@ -259,7 +263,7 @@ void condR(TruthNode* assume, std::vector<Step> *proof){
         //----------------------------------------------------------------    
         third_assume = Step(*decomposed.first.get_negation());
         second_layer->push_back(third_assume);
-        third_layer = &third_assume.subproof.value();
+         third_layer = &second_layer->at(second_layer->size()-1).subproof.value();
             //----------------------------------------------------------------
             third_layer->push_back(Step(
                 goal,
@@ -295,20 +299,328 @@ void condR(TruthNode* assume, std::vector<Step> *proof){
 }
 
 void ncondR(TruthNode* assume, std::vector<Step> *proof){
+    std::pair<Expr, Expr> decomposed = (*assume->expr.get_unnegation()).decompose();
+    Expr *first_copy = new Expr(decomposed.first);
+    Expr goal =  Expr(ExprType::Conjunction,
+        first_copy,
+        decomposed.second.get_negation());
     
+    Step second_assume = Step(*goal.get_negation());
+    proof->push_back(second_assume);
+    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof.value();
+        //----------------------------------------------------------------
+        Step third_assume = Step(decomposed.first);
+        second_layer->push_back(third_assume);
+        std::vector<Step>* third_layer = &second_layer->at(second_layer->size()-1).subproof.value();
+            //----------------------------------------------------------------
+            Step fourth_assume = Step(*decomposed.second.get_negation());
+            third_layer->push_back(fourth_assume);
+            std::vector<Step>* fourth_layer = &fourth_assume.subproof.value();
+                //----------------------------------------------------------------
+                fourth_layer->push_back(Step(
+                    goal,
+                    InferenceRule::ConjunctionIntroduction,
+                    StepLoc{second_layer, second_layer->size()-1}
+                ));
+                fourth_layer->at(fourth_layer->size()-1).references.value().push_back(StepLoc{third_layer,0});
+                fourth_layer->push_back(Step(
+                    Expr(ExprType::Contradiction),
+                    InferenceRule::ContradictionIntroduction,
+                    StepLoc{proof, proof->size()-1}
+                ));
+                fourth_layer->at(fourth_layer->size()-1).references.value().push_back(StepLoc{fourth_layer,0});
+            //----------------------------------------------------------------    
+            third_layer->push_back(Step(
+                *(*decomposed.second.get_negation()).get_negation(),
+                InferenceRule::NegationIntroduction,
+                StepLoc{third_layer,third_layer->size()-1}
+            ));
+            third_layer->push_back(Step(
+                decomposed.second,
+                InferenceRule::NegationElimination,
+                StepLoc{third_layer, third_layer->size()-1}
+            ));
+        //----------------------------------------------------------------    
+        second_layer->push_back(Step(
+            *assume->expr.get_unnegation(),
+            InferenceRule::ConditionalIntroduction,
+            StepLoc{second_layer,second_layer->size()-1}
+        ));
+        second_layer->push_back(Step(
+            goal,
+            InferenceRule::DisjunctionIntroduction,
+            mapping.at(assume)
+        ));
+        second_layer->at(second_layer->size()-1).references.value().push_back(StepLoc{second_layer,second_layer->size()-2});
+    //----------------------------------------------------------------  
+    proof->push_back(Step(
+        *(*goal.get_negation()).get_negation(),
+        InferenceRule::NegationIntroduction,
+        StepLoc{proof,proof->size()-1}
+    ));    
+    proof->push_back(Step(
+        goal,
+        InferenceRule::NegationElimination,
+        StepLoc{proof, proof->size()-1}
+    ));
+    mapping.at(assume) = StepLoc{proof,proof->size()-1};
 }
 
 void bcondR(TruthNode* assume, std::vector<Step> *proof){
-    
+    std::pair<Expr, Expr> decomposed = assume->expr.decompose();
+    Expr *first_copy = new Expr(decomposed.first);
+    Expr *second_copy = new Expr(decomposed.second);
+    Expr goal =  Expr(ExprType::Disjunction,
+        first_copy,
+        decomposed.first.get_negation());
+        
+    Step second_assume = Step(*goal.get_negation());
+    proof->push_back(second_assume);
+    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof.value();
+        //----------------------------------------------------------------
+        Step third_assume = Step(decomposed.first);
+        second_layer->push_back(third_assume);
+        std::vector<Step>* third_layer = &second_layer->at(second_layer->size()-1).subproof.value();
+            //----------------------------------------------------------------
+            third_layer->push_back(Step(
+                goal,
+                InferenceRule::DisjunctionIntroduction,
+                StepLoc{second_layer, second_layer->size()-1}
+            ));
+            third_layer->push_back(Step(
+                Expr(ExprType::Contradiction),
+                InferenceRule::ContradictionIntroduction,
+                StepLoc{proof, proof->size()-1}
+            ));
+            third_layer->at(third_layer->size()-1).references.value().push_back(StepLoc{third_layer,0});
+        //----------------------------------------------------------------    
+        second_layer->push_back(Step(
+            *decomposed.first.get_negation(),
+            InferenceRule::NegationIntroduction,
+            StepLoc{second_layer,second_layer->size()-1}
+        ));
+        second_layer->push_back(Step(
+            goal,
+            InferenceRule::DisjunctionIntroduction,
+            StepLoc{second_layer, second_layer->size()-1}
+        ));
+        second_layer->push_back(Step(
+            Expr(ExprType::Contradiction),
+            InferenceRule::ContradictionIntroduction,
+            StepLoc{proof, proof->size()-1}
+        ));
+        second_layer->at(second_layer->size()-1).references.value().push_back(StepLoc{second_layer,second_layer->size()-2});
+    //----------------------------------------------------------------    
+    proof->push_back(Step(
+        *(*goal.get_negation()).get_negation(),
+        InferenceRule::NegationIntroduction,
+        StepLoc{proof,proof->size()-1}
+    ));
+    proof->push_back(Step(
+        goal,
+        InferenceRule::NegationElimination,
+        StepLoc{proof,proof->size()-1}
+    )); 
+    Expr* goal_L = new Expr(ExprType::Conjunction,
+        first_copy,
+        second_copy
+    );
+    Expr* goal_R = new Expr(ExprType::Conjunction,
+        first_copy,
+        second_copy
+    );
+    Expr goal = Expr (
+        ExprType::Disjunction,
+        goal_L,
+        goal_R
+    );
+    second_assume = Step(decomposed.first);
+    proof->push_back(second_assume);
+    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof.value();
+        //----------------------------------------------------------------
+        second_layer->push_back(Step(
+            decomposed.second,
+            InferenceRule::BiconditionalElimination,
+            mapping.at(assume)
+        ));
+        second_layer->at(second_layer->size()-1).references.value().push_back(StepLoc{proof,proof->size()-1});
+        second_layer->push_back(Step(
+            Expr(ExprType::Conjunction, first_copy,second_copy),
+            InferenceRule::ConjunctionIntroduction,
+            StepLoc{proof,proof->size()-1}
+        ));
+        second_layer->at(second_layer->size()-1).references.value().push_back(StepLoc{second_layer,second_layer->size()-2});
+        second_layer->push_back(Step(
+            goal,
+            InferenceRule::DisjunctionIntroduction,
+            StepLoc{second_layer,second_layer->size()-1}
+        ));
+    //----------------------------------------------------------------
+    second_assume = Step(*decomposed.first.get_negation());
+    proof->push_back(second_assume);
+    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof.value();
+        //----------------------------------------------------------------
+        third_assume = Step(decomposed.second);
+        second_layer->push_back(third_assume);
+         third_layer = &second_layer->at(second_layer->size()-1).subproof.value();
+            //----------------------------------------------------------------
+            third_layer->push_back(Step(
+                decomposed.first,
+                InferenceRule::BiconditionalElimination,
+                mapping.at(assume)
+            ));
+            third_layer->at(third_layer->size()-1).references.value().push_back(StepLoc{second_layer,second_layer->size()-1});
+            third_layer->push_back(Step(
+                Expr(ExprType::Contradiction),
+                InferenceRule::ContradictionIntroduction,
+                StepLoc{proof, proof->size()-1}
+            ));
+            third_layer->at(third_layer->size()-1).references.value().push_back(StepLoc{third_layer,0});
+        //----------------------------------------------------------------    
+        second_layer->push_back(Step(
+            *decomposed.second.get_negation(),
+            InferenceRule::NegationIntroduction,
+            StepLoc{second_layer, second_layer->size()-1}
+        ));
+        second_layer->push_back(Step(
+            Expr(ExprType::Conjunction, decomposed.first.get_negation(),decomposed.second.get_negation()),
+            InferenceRule::ConjunctionIntroduction,
+            StepLoc{proof,proof->size()-1}
+        ));
+        second_layer->at(second_layer->size()-1).references.value().push_back(StepLoc{second_layer,second_layer->size()-2});
+        second_layer->push_back(Step(
+            goal,
+            InferenceRule::DisjunctionIntroduction,
+            StepLoc{second_layer,second_layer->size()-1}
+        ));
+    //----------------------------------------------------------------
+    proof->push_back(Step(
+        goal,
+        InferenceRule::DisjunctionElimination,
+        StepLoc{proof,proof->size()-3}
+    ));
+    proof->at(proof->size()-1).references.value().push_back(StepLoc{proof,proof->size()-3});
+    proof->at(proof->size()-1).references.value().push_back(StepLoc{proof,proof->size()-2});
+    mapping.at(assume) = StepLoc{proof,proof->size()-1};
 }
 
 void nbcondR(TruthNode* assume, std::vector<Step> *proof){
-    
-}
+    std::pair<Expr, Expr> decomposed = (*assume->expr.get_unnegation()).decompose();
+    Expr *first_copy = new Expr(decomposed.first);
+    Expr *second_copy = new Expr(decomposed.second);
+    Expr *first_goal = new Expr(ExprType::Conjunction,first_copy,decomposed.second.get_negation());
+    Expr *second_goal = new Expr(ExprType::Conjunction,decomposed.first.get_negation(),second_copy);
+    Expr goal =  Expr(ExprType::Disjunction,
+        first_goal,
+        second_goal
+    );
+    Step second_assume = Step(*goal.get_negation());
+    proof->push_back(second_assume);
+    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof.value();
+        //----------------------------------------------------------------      
+        Step third_assume = Step(decomposed.first);
+        second_layer->push_back(third_assume);
+        std::vector<Step>* third_layer = &second_layer->at(second_layer->size()-1).subproof.value();
+            //----------------------------------------------------------------
+            Step fourth_assume = Step(*decomposed.second.get_negation());
+            third_layer->push_back(fourth_assume);
+            std::vector<Step>* fourth_layer = &third_layer->at(third_layer->size()-1).subproof.value();
+                //----------------------------------------------------------------
+                fourth_layer->push_back(Step(
+                    *first_goal,
+                    InferenceRule::ConjunctionIntroduction,
+                    StepLoc{second_layer,second_layer->size()-1}
+                ));
+                fourth_layer->at(fourth_layer->size()-1).references.value().push_back(StepLoc{third_layer,third_layer->size()-1});
+                fourth_layer->push_back(Step(
+                    goal,
+                    InferenceRule::DisjunctionIntroduction,
+                    StepLoc{fourth_layer,fourth_layer->size()-1}
+                ));
+                fourth_layer->push_back(Step(
+                    Expr(ExprType::Contradiction),
+                    InferenceRule::ContradictionIntroduction,
+                    StepLoc{proof, proof->size()-1}
+                ));
+                fourth_layer->at(fourth_layer->size()-1).references.value().push_back(StepLoc{fourth_layer,fourth_layer->size()-2});
+            //----------------------------------------------------------------  
+            third_layer->push_back(Step(
+                *(*decomposed.second.get_negation()).get_negation(),
+                InferenceRule::NegationIntroduction,
+                StepLoc{third_layer,third_layer->size()-1}
+            ));
+            third_layer->push_back(Step(
+                decomposed.second,
+                InferenceRule::NegationElimination,
+                StepLoc{third_layer, third_layer->size()-1}
+            ));
+        //----------------------------------------------------------------    
+        third_assume = Step(decomposed.second);
+        second_layer->push_back(third_assume);
+        third_layer = &second_layer->at(second_layer->size()-1).subproof.value();
+            //----------------------------------------------------------------
+            fourth_assume = Step(*decomposed.first.get_negation());
+            third_layer->push_back(fourth_assume);
+            fourth_layer = &third_layer->at(third_layer->size()-1).subproof.value();
+                //----------------------------------------------------------------
+                fourth_layer->push_back(Step(
+                    *second_goal,
+                    InferenceRule::ConjunctionIntroduction,
+                    StepLoc{second_layer,second_layer->size()-1}
+                ));
+                fourth_layer->at(fourth_layer->size()-1).references.value().push_back(StepLoc{third_layer,third_layer->size()-1});
+                fourth_layer->push_back(Step(
+                    goal,
+                    InferenceRule::DisjunctionIntroduction,
+                    StepLoc{fourth_layer,fourth_layer->size()-1}
+                ));
+                fourth_layer->push_back(Step(
+                    Expr(ExprType::Contradiction),
+                    InferenceRule::ContradictionIntroduction,
+                    StepLoc{proof, proof->size()-1}
+                ));
+                fourth_layer->at(fourth_layer->size()-1).references.value().push_back(StepLoc{fourth_layer,fourth_layer->size()-2});
+            //----------------------------------------------------------------  
+            third_layer->push_back(Step(
+                *(*decomposed.first.get_negation()).get_negation(),
+                InferenceRule::NegationIntroduction,
+                StepLoc{third_layer,third_layer->size()-1}
+            ));
+            third_layer->push_back(Step(
+                decomposed.first,
+                InferenceRule::NegationElimination,
+                StepLoc{third_layer, third_layer->size()-1}
+            ));
+        //---------------------------------------------------------------- 
+        second_layer->push_back(Step(
+            *assume->expr.get_unnegation(),
+            InferenceRule::BiconditionalIntroduction,
+            StepLoc{second_layer,second_layer->size()-2}
+        ));
+        second_layer->at(second_layer->size()-1).references.value().push_back(StepLoc{second_layer,second_layer->size()-2});
+        second_layer->push_back(Step(
+            Expr(ExprType::Contradiction),
+            InferenceRule::ContradictionIntroduction,
+            mapping.at(assume)
+        ));
+        second_layer->at(second_layer->size()-1).references.value().push_back(StepLoc{second_layer,second_layer->size()-2});
+    //----------------------------------------------------------------     
+    proof->push_back(Step(
+        *(*goal.get_negation()).get_negation(),
+        InferenceRule::NegationIntroduction,
+        StepLoc{proof,proof->size()-1}
+    ));
+    proof->push_back(Step(
+        goal,
+        InferenceRule::NegationElimination,
+        StepLoc{proof,proof->size()-1}
+    ));
+    mapping.at(assume) = StepLoc{proof,proof->size()-1};
+}   
 
-void closeR(TruthNode* assume, std::vector<Step> *proof){
+// void closeR(TruthNode* assume, std::vector<Step> *proof){
     
-}
+// }
 
 void checkNode(TruthNode *tnode, std::vector<Step> *proof){
    
