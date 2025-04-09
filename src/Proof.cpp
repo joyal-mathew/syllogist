@@ -763,5 +763,6 @@ Proof to_proof(std::pair<TruthNode *, int> tt){
         root = root->children.first;
     }
     std::vector<Step> pro = {};
-    int i = 0;
+    checkNode(root,&pro);
+    return Proof(premis,pro);
 }
