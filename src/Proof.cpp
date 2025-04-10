@@ -757,12 +757,19 @@ Proof to_proof(std::pair<TruthNode *, int> tt){
     
     TruthNode* root = tt.first;
     std::vector<Step> premis{};
-    for (int i = 0; i < tt.second; i++){
+    for (int i = 0; i < tt.second-1; i++){
         premis.push_back(Step(root->expr,false));
         mapping.insert({root, StepLoc{&premis, i}});
         root = root->children.first;
     }
     std::vector<Step> pro = {};
-    checkNode(root,&pro);
+    pro.push_back(Step(root->expr));
+
+    checkNode(tt.first,&(pro[0].subproof.value()));
+    pro.push_back(Step(
+        *pro[0].expr.get_unnegation(),
+        InferenceRule::NegationIntroduction,
+        StepLoc{&pro,0}
+    ));
     return Proof(premis,pro);
 }
