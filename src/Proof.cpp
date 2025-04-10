@@ -439,14 +439,14 @@ void bcondR(TruthNode* assume, std::vector<Step> *proof){
         decomposed.first.get_unnegation(),
         decomposed.second.get_negation()
     );
-    Expr goal = Expr (
+    goal = Expr (
         ExprType::Disjunction,
         goal_L,
         goal_R
     );
     second_assume = Step(decomposed.first);
     proof->push_back(second_assume);
-    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof.value();
+    second_layer = &proof->at(proof->size()-1).subproof.value();
         //----------------------------------------------------------------
         second_layer->push_back(Step(
             decomposed.second,
@@ -468,7 +468,7 @@ void bcondR(TruthNode* assume, std::vector<Step> *proof){
     //----------------------------------------------------------------
     second_assume = Step(*decomposed.first.get_negation());
     proof->push_back(second_assume);
-    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof.value();
+    second_layer = &proof->at(proof->size()-1).subproof.value();
         //----------------------------------------------------------------
         third_assume = Step(decomposed.second);
         second_layer->push_back(third_assume);
@@ -709,45 +709,45 @@ void checkNode(TruthNode *tnode, std::vector<Step> *proof){
        
     }
     ExprType::ExprType expr_rule = tnode->expr.type;
-    switch (expr_rule)
-    {
-        case ExprType::Conditional:
-        condR(tnode,proof);
-        break;
+    bool negation = expr_rule == ExprType::Negation;
+    if (!negation)
+        switch (expr_rule)
+        {
+            case ExprType::Conditional:
+            condR(tnode,proof);
+            break;
 
-        case ExprType::Biconditional:
-        bcondR(tnode,proof);
-        break;
+            case ExprType::Biconditional:
+            bcondR(tnode,proof);
+            break;
 
-        case ExprType::Negation:
-        ExprType::ExprType neg_expr_rule = tnode->expr.get_unnegation_type();
-            switch (neg_expr_rule)
-            {
-                case ExprType::Conjunction:
-                nconR(tnode,proof);
-                break;
-        
-                case ExprType::Disjunction:
-                ndisR(tnode,proof);
-                break;
-        
-                case ExprType::Conditional:
-                ncondR(tnode,proof);
-                break;
-        
-                case ExprType::Biconditional:
-                nbcondR(tnode,proof);
-                break;
-            
             default:
                 break;
-            }
-        break;
+        }
+    else{
+        expr_rule = tnode->expr.get_unnegation_type();
+        switch (expr_rule)
+        {
+            case ExprType::Conjunction:
+            nconR(tnode,proof);
+            break;
 
-    default:
-        break;
+            case ExprType::Disjunction:
+            ndisR(tnode,proof);
+            break;
+
+            case ExprType::Conditional:
+            ncondR(tnode,proof);
+            break;
+
+            case ExprType::Biconditional:
+            nbcondR(tnode,proof);
+            break;
+        
+        default:
+            break;
+        }
     }
-
     checkNode(tnode->children.first,proof);
     if (tnode->children.second){checkNode(tnode->children.second,proof);}
 
