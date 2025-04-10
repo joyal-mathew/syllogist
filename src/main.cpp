@@ -24,8 +24,10 @@ int main(int argc, char **argv) {
 
     std::pair<TruthNode *, int> truth_tree = compute_truth_tree(expressions);
 
-    if (truth_tree.first)
+    if (truth_tree.first) {
         std::cout << "Argument is valid\n";
+        to_proof(truth_tree);
+    }
     else
         std::cout << "Argument is invalid\n";
 

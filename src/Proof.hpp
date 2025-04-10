@@ -5,7 +5,7 @@
 #include <optional>
 #include <vector>
 
-typedef std::pair<std::vector<Step>*,int> StepLoc;
+
 
 namespace InferenceRule {
     enum InferenceRule {
@@ -29,7 +29,7 @@ namespace InferenceRule {
 struct Step {
     Expr expr;
     InferenceRule::InferenceRule rule;
-    std::optional<std::vector<StepLoc>> references;
+    std::optional<std::vector<std::pair<std::vector<Step>*,int>>> references;
     std::optional<std::vector<Step>> subproof;
 
     Step(Expr e, bool sp = true)
@@ -40,12 +40,14 @@ struct Step {
         }
 
 
-    Step(Expr e, InferenceRule::InferenceRule r, StepLoc sl)
+    Step(Expr e, InferenceRule::InferenceRule r, std::pair<std::vector<Step>*,int> sl)
         : expr(e), rule(r){
-            references = std::make_optional(std::vector<StepLoc>());
+            references = std::make_optional(std::vector<std::pair<std::vector<Step>*,int>>());
             references.value().push_back(sl);
         }
 };
+
+typedef std::pair<std::vector<Step>*,int> StepLoc;
 
 struct Proof {
     std::vector<Step> premises;
