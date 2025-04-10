@@ -749,7 +749,15 @@ void checkNode(TruthNode *tnode, std::vector<Step> *proof){
         }
     }
     checkNode(tnode->children.first,proof);
-    if (tnode->children.second){checkNode(tnode->children.second,proof);}
+    if (tnode->children.second){
+        checkNode(tnode->children.second,proof);
+        proof->push_back(Step(
+            Expr(ExprType::Contradiction),
+            InferenceRule::DisjunctionElimination,
+            StepLoc{proof, proof->size()-2}
+        ));
+        proof->at(proof->size()-1).references.value().push_back(StepLoc{proof,proof->size()-2});
+    }
 
 }
 
