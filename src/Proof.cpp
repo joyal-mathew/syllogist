@@ -764,12 +764,17 @@ Proof to_proof(std::pair<TruthNode *, int> tt){
     }
     std::vector<Step> pro = {};
     pro.push_back(Step(root->expr));
-
+    mapping.insert({root,StepLoc{&pro,0}});
     checkNode(tt.first,&(pro[0].subproof.value()));
     pro.push_back(Step(
-        *pro[0].expr.get_unnegation(),
+        *pro[0].expr.get_negation(),
         InferenceRule::NegationIntroduction,
         StepLoc{&pro,0}
+    ));
+    pro.push_back(Step(
+        *pro[0].expr.get_unnegation(),
+        InferenceRule::NegationElimination,
+        StepLoc{&pro,1}
     ));
     return Proof(premis,pro);
 }
