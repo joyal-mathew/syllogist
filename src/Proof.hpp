@@ -45,6 +45,8 @@ struct Step {
             references = std::make_optional(std::vector<std::pair<std::vector<Step>*,int>>());
             references.value().push_back(sl);
         }
+
+    Step(const Step &step) : expr(step.expr), rule(step.rule), references(step.references), subproof(step.subproof) {}
 };
 
 typedef std::pair<std::vector<Step>*,int> StepLoc;

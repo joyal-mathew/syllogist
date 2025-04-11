@@ -2,6 +2,7 @@
 #include "TruthTree.hpp"
 #include "parse.hpp"
 #include "errors.hpp"
+#include "aris.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -26,7 +27,8 @@ int main(int argc, char **argv) {
 
     if (truth_tree.first) {
         std::cout << "Argument is valid\n";
-        to_proof(truth_tree);
+        Proof proof = to_proof(truth_tree);
+        to_aris(proof);
     }
     else
         std::cout << "Argument is invalid\n";
