@@ -2,6 +2,7 @@
 #include "TruthTree.hpp"
 #include "parse.hpp"
 #include "errors.hpp"
+#include "aris.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -24,8 +25,11 @@ int main(int argc, char **argv) {
 
     std::pair<TruthNode *, int> truth_tree = compute_truth_tree(expressions);
 
-    if (truth_tree.first)
+    if (truth_tree.first) {
         std::cout << "Argument is valid\n";
+        Proof proof = to_proof(truth_tree);
+        to_aris(proof);
+    }
     else
         std::cout << "Argument is invalid\n";
 

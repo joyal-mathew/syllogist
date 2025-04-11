@@ -4,8 +4,18 @@
 #include "aris.hpp"
 #include "Expr.hpp"
 
-void subproof(std::vector<Step>& proof, int& line_num, int& indent_level, int& proof_num) {
-    --indent_level;
+void subproof(std::ostream& file, std::vector<Step>& proof, int& line_num, int& indent_level, int& proof_num) {
+    std::string indent(indent_level * 2, ' ');
+    for (unsigned int i = 0; i < proof.size() ; i++) {
+        //file << indent << "<step linenum=\"" << line_num++ << "\">\n";
+        file << indent <<  proof[i].expr.to_string() << "\n";
+        //file << indent << "<rule>EMPTY_RULE</rule>" << "\n";
+        //file << indent << "</step>\n";
+        if (proof[i].subproof.has_value()) { // Start of new subproof
+            subproof(file, proof[i].subproof.value(), line_num, ++indent_level, proof_num);
+        }
+    }
+    indent_level--;
 }
 
 void to_aris(Proof& proof) {
@@ -32,7 +42,7 @@ void to_aris(Proof& proof) {
     }
 
     // Proof
-    // subproof(proof->proof, line_num, ++indent_level, ++proof_num);
+    subproof(file, proof.proof, line_num, ++indent_level, ++proof_num);
 
     // Ender
     file << indent << "</proof>\n";

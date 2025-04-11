@@ -7,7 +7,7 @@
         if (!(condition)) {                                                    \
             std::cerr << __FILE__ << ':' << __LINE__                           \
                       << ":\tAssertion Failed: " #condition << std::endl;      \
-            exit(-1);                                                          \
+            throw std::runtime_error("ASSERTION ERROR");                       \
         }                                                                      \
     } while (false)
 
