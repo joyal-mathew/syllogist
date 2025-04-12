@@ -73,6 +73,18 @@ Expr *Expr::get_unnegation() const {
     return expr;
 }
 
+Expr Expr::get_negation_v() const {
+    Expr expr(*this);
+    expr.negate();
+    return expr;
+}
+
+Expr Expr::get_unnegation_v() const {
+    Expr expr(*this);
+    expr.unnegate();
+    return expr;
+}
+
 ExprType::ExprType Expr::get_unnegation_type() const {
     DEBUG_ASSERT(type == ExprType::Negation);
     return std::get<1>(data)->type;

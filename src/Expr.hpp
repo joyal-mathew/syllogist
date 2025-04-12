@@ -49,6 +49,8 @@ public:
     void unnegate();
     Expr *get_negation() const;
     Expr *get_unnegation() const;
+    Expr get_negation_v() const;
+    Expr get_unnegation_v() const;
     ExprType::ExprType get_unnegation_type() const;
     std::pair<Expr, Expr> decompose() const;
 
