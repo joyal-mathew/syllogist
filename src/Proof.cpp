@@ -618,9 +618,9 @@ void nbcondR(TruthNode* assume, std::vector<Step> *proof){
 // void closeR(TruthNode* assume, std::vector<Step> *proof){
     
 // }
-
+int Count = 0;
 void checkNode(TruthNode *tnode, std::vector<Step> *proof){
-   
+    Count ++;
     
     bool premis = mapping.find(tnode) != mapping.end();
 
@@ -745,10 +745,7 @@ void checkNode(TruthNode *tnode, std::vector<Step> *proof){
         ));
         proof->at(proof->size()-1).references.value().push_back(StepLoc{proof,proof->size()-3});
         proof->at(proof->size()-1).references.value().push_back(StepLoc{proof,proof->size()-2});
-        std::vector<StepLoc> refs = proof->at(proof->size()-1).references.value();
-        std::cout << " " + refs[1].first->at(refs[1].second).expr.to_string() + " "  << refs[1].first << " "<<  refs[1].second;
     }
-
 }
 
 Proof to_proof(std::pair<TruthNode *, int> tt){
@@ -762,8 +759,6 @@ Proof to_proof(std::pair<TruthNode *, int> tt){
     }
     ans.proof.push_back(Step(root->expr));
     mapping.insert({root,StepLoc{&ans.proof,0}});
-    checkNode(tt.first,&ans.proof.at(0).subproof.value());
-    
     ans.proof.push_back(Step(
         ans.proof[0].expr.get_negation_v(),
         InferenceRule::NegationIntroduction,
@@ -774,5 +769,6 @@ Proof to_proof(std::pair<TruthNode *, int> tt){
         InferenceRule::NegationElimination,
         StepLoc{&ans.proof,1}
     ));
+    checkNode(tt.first,&ans.proof.at(0).subproof.value());
     return ans;
 }
