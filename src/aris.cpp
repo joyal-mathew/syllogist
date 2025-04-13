@@ -94,14 +94,25 @@ std::string rule_to_string_plain(InferenceRule::InferenceRule rule) {
     }
 }
 
-std::string reference_print(std::vector<StepLoc>& refs) {
+std::string reference_print(std::vector<StepLoc>& refs, InferenceRule::InferenceRule rule) {
+    (void) rule;
     std::string res = " (";
     std::cout << "refs size - " << refs.size() << " :";
     for (unsigned int i = 0; i < refs.size(); i++) {
-        std::cout << " " + refs[i].first->at(refs[i].second).expr.to_string();
-        int num = refs[i].first->at(refs[i].second).line_number;
-        res += std::to_string(num);
-        //! Add subproof range
+        Step* step = &refs[i].first->at(refs[i].second);
+        std::cout << " " + step->expr.to_string() << " " << step;
+        res += std::to_string(step->line_number);
+        // if (step->subproof.has_value()) {
+        //     switch (rule) {
+        //         case InferenceRule::DisjunctionElimination:
+        //         case InferenceRule::ConditionalIntroduction:
+        //         case InferenceRule::BiconditionalIntroduction: {
+        //             res+= "-" + std::to_string(step->subproof.value().at(step->subproof.value().size()-1).line_number);
+        //             break; }
+        //         default:
+        //             break;
+        //     }
+        // }
         if (i != refs.size()-1)
             res+=", ";
     }
@@ -173,8 +184,8 @@ void to_plain_subproof(std::ofstream& file, std::vector<Step>& proof, int& line_
                 subproof_end = "└ ";
                 indent_level--;
             }
-            std::cout << "At expr - " << proof[i].expr.to_string() << "\n";
-            file << line_num << ". " << sub_proof_indent(indent_level) << subproof_end << proof[i].expr.to_string() << " : " << rule_to_string_plain(proof[i].rule) << reference_print(proof[i].references.value()) << "\n";
+            std::cout << "At expr - " << proof[i].expr.to_string() << " " << &proof[i] << "\n";
+            file << line_num << ". " << sub_proof_indent(indent_level) << subproof_end << proof[i].expr.to_string() << " : " << rule_to_string_plain(proof[i].rule) << reference_print(proof[i].references.value(), proof[i].rule) << "\n";
             proof[i].line_number = line_num;
             line_num++;
         }
