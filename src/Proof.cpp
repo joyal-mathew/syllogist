@@ -748,26 +748,25 @@ void checkNode(TruthNode *tnode, std::vector<Step> *proof){
 
 Proof to_proof(std::pair<TruthNode *, int> tt){
     
+    Proof ans = Proof();
     TruthNode* root = tt.first;
-    std::vector<Step> premis{};
     for (int i = 0; i < tt.second-1; i++){
-        premis.push_back(Step(root->expr,false));
-        mapping.insert({root, StepLoc{&premis, i}});
+        ans.premises.push_back(Step(root->expr,false));
+        mapping.insert({root, StepLoc{&ans.premises, i}});
         root = root->children.first;
     }
-    std::vector<Step> pro = {};
-    pro.push_back(Step(root->expr));
-    mapping.insert({root,StepLoc{&pro,0}});
-    checkNode(tt.first,&(pro[0].subproof.value()));
-    pro.push_back(Step(
-        pro[0].expr.get_negation_v(),
+    ans.proof.push_back(Step(root->expr));
+    mapping.insert({root,StepLoc{&ans.proof,0}});
+    checkNode(tt.first,&(ans.proof[0].subproof.value()));
+    ans.proof.push_back(Step(
+        ans.proof[0].expr.get_negation_v(),
         InferenceRule::NegationIntroduction,
-        StepLoc{&pro,0}
+        StepLoc{&ans.proof,0}
     ));
-    pro.push_back(Step(
-        pro[0].expr.get_unnegation_v(),
+    ans.proof.push_back(Step(
+        ans.proof[0].expr.get_unnegation_v(),
         InferenceRule::NegationElimination,
-        StepLoc{&pro,1}
+        StepLoc{&ans.proof,1}
     ));
-    return Proof(premis,pro);
+    return ans;
 }
