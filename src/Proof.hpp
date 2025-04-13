@@ -5,8 +5,6 @@
 #include <optional>
 #include <vector>
 
-
-
 namespace InferenceRule {
     enum InferenceRule {
         Assume,
@@ -31,6 +29,7 @@ struct Step {
     InferenceRule::InferenceRule rule;
     std::optional<std::vector<std::pair<std::vector<Step>*,int>>> references;
     std::optional<std::vector<Step>> subproof;
+    int line_number;
 
     Step(Expr e, bool sp = true)
         : expr(e), rule(InferenceRule::Assume){
