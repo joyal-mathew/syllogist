@@ -736,14 +736,17 @@ void checkNode(TruthNode *tnode, std::vector<Step> *proof){
     checkNode(tnode->children.first,proof);
     if (tnode->children.second){
         checkNode(tnode->children.second,proof);
-        std::cout << tnode->references.first;
+        
         proof->push_back(Step(
             Expr(ExprType::Contradiction),
             InferenceRule::DisjunctionElimination,
-            mapping.at(tnode->references.first)
+            mapping.at(tnode->children.first->references.first)
+            //StepLoc{proof,proof->size()-2}
         ));
         proof->at(proof->size()-1).references.value().push_back(StepLoc{proof,proof->size()-3});
         proof->at(proof->size()-1).references.value().push_back(StepLoc{proof,proof->size()-2});
+        std::vector<StepLoc> refs = proof->at(proof->size()-1).references.value();
+        std::cout << " " + refs[1].first->at(refs[1].second).expr.to_string() + " "  << refs[1].first << " "<<  refs[1].second;
     }
 
 }
@@ -752,7 +755,6 @@ Proof to_proof(std::pair<TruthNode *, int> tt){
     
     Proof ans({},{});
     TruthNode* root = tt.first;
-    std::cout << root;
     for (int i = 0; i < tt.second-1; i++){
         ans.premises.push_back(Step(root->expr,false));
         mapping.insert({root, StepLoc{&ans.premises, i}});
@@ -760,7 +762,8 @@ Proof to_proof(std::pair<TruthNode *, int> tt){
     }
     ans.proof.push_back(Step(root->expr));
     mapping.insert({root,StepLoc{&ans.proof,0}});
-    checkNode(tt.first,&(ans.proof[0].subproof.value()));
+    checkNode(tt.first,&ans.proof.at(0).subproof.value());
+    
     ans.proof.push_back(Step(
         ans.proof[0].expr.get_negation_v(),
         InferenceRule::NegationIntroduction,
