@@ -53,10 +53,6 @@ typedef std::pair<std::vector<Step>*,int> StepLoc;
 struct Proof {
     std::vector<Step> premises;
     std::vector<Step> proof;
-    Proof(){
-        premises = {};
-        proof = {};
-    }
     Proof(std::vector<Step> pre, std::vector<Step> pro)
         : premises(pre), proof(pro){}
 };

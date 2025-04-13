@@ -748,7 +748,7 @@ void checkNode(TruthNode *tnode, std::vector<Step> *proof){
 
 Proof to_proof(std::pair<TruthNode *, int> tt){
     
-    Proof ans = Proof();
+    Proof ans({},{});
     TruthNode* root = tt.first;
     for (int i = 0; i < tt.second-1; i++){
         ans.premises.push_back(Step(root->expr,false));
