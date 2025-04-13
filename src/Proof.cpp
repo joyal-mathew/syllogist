@@ -736,6 +736,7 @@ void checkNode(TruthNode *tnode, std::vector<Step> *proof){
     checkNode(tnode->children.first,proof);
     if (tnode->children.second){
         checkNode(tnode->children.second,proof);
+        std::cout << tnode->references.first;
         proof->push_back(Step(
             Expr(ExprType::Contradiction),
             InferenceRule::DisjunctionElimination,
@@ -751,6 +752,7 @@ Proof to_proof(std::pair<TruthNode *, int> tt){
     
     Proof ans({},{});
     TruthNode* root = tt.first;
+    std::cout << root;
     for (int i = 0; i < tt.second-1; i++){
         ans.premises.push_back(Step(root->expr,false));
         mapping.insert({root, StepLoc{&ans.premises, i}});
