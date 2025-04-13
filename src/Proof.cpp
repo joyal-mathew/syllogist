@@ -626,7 +626,7 @@ void checkNode(TruthNode *tnode, std::vector<Step> *proof){
 
     DecompositionRule::DecompositionRule rule = tnode->rule; 
     if (!premis){
-        mapping.insert({tnode,StepLoc(proof,proof->size())});
+        mapping.insert({tnode,StepLoc{proof,proof->size()}});
         switch (rule) {
             case DecompositionRule::DoubleNegation:
                 proof->push_back(Step(tnode->expr,
