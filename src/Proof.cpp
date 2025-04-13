@@ -739,8 +739,9 @@ void checkNode(TruthNode *tnode, std::vector<Step> *proof){
         proof->push_back(Step(
             Expr(ExprType::Contradiction),
             InferenceRule::DisjunctionElimination,
-            StepLoc{proof, proof->size()-2}
+            mapping.at(tnode->references.first)
         ));
+        proof->at(proof->size()-1).references.value().push_back(StepLoc{proof,proof->size()-3});
         proof->at(proof->size()-1).references.value().push_back(StepLoc{proof,proof->size()-2});
     }
 
