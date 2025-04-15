@@ -51,11 +51,11 @@ void nconR(TruthNode* assume, std::vector<Step> *proof){
 
     Step second_assume(*goal.get_negation());
     proof->push_back(second_assume);
-    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof.value();
+    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof;
         //----------------------------------------------------------------
         Step third_assume(*decomposed.first.get_negation());
         second_layer->push_back(third_assume);
-        std::vector<Step>* third_layer = &second_layer->at(second_layer->size()-1).subproof.value();
+        std::vector<Step>* third_layer = &second_layer->at(second_layer->size()-1).subproof;
             //----------------------------------------------------------------
             third_layer->push_back(Step(
                 goal,
@@ -81,7 +81,7 @@ void nconR(TruthNode* assume, std::vector<Step> *proof){
         ));
         Step third_assume2(*decomposed.second.get_negation());
         second_layer->push_back(third_assume2);
-        third_layer = &second_layer->at(second_layer->size()-1).subproof.value();
+        third_layer = &second_layer->at(second_layer->size()-1).subproof;
             //----------------------------------------------------------------
             third_layer->push_back(Step(
                 goal,
@@ -137,7 +137,7 @@ void ndisR(TruthNode* assume, std::vector<Step> *proof){
     std::pair<Expr, Expr> decomposed = assume->expr.get_unnegation()->decompose();
     Step second_assume(decomposed.first);
     proof->push_back(second_assume);
-    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof.value();
+    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof;
         //----------------------------------------------------------------
         second_layer->push_back(Step(
             assume->expr.get_unnegation_v(),
@@ -158,7 +158,7 @@ void ndisR(TruthNode* assume, std::vector<Step> *proof){
     ));
     Step second_assume2 (decomposed.second);
     proof->push_back(second_assume2);
-    second_layer = &proof->at(proof->size()-1).subproof.value();
+    second_layer = &proof->at(proof->size()-1).subproof;
         //----------------------------------------------------------------
         second_layer->push_back(Step(
             assume->expr.get_unnegation_v(),
@@ -201,11 +201,11 @@ void condR(TruthNode* assume, std::vector<Step> *proof){
         
     Step second_assume(*goal.get_negation());
     proof->push_back(second_assume);
-    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof.value();
+    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof;
         //----------------------------------------------------------------
         Step third_assume(decomposed.first);
         second_layer->push_back(third_assume);
-        std::vector<Step>* third_layer = &second_layer->at(second_layer->size()-1).subproof.value();
+        std::vector<Step>* third_layer = &second_layer->at(second_layer->size()-1).subproof;
             //----------------------------------------------------------------
             third_layer->push_back(Step(
                 goal,
@@ -250,10 +250,10 @@ void condR(TruthNode* assume, std::vector<Step> *proof){
         decomposed.first.get_negation(),
         second_copy);
     proof->emplace_back(*goal2.get_negation());
-    second_layer = &proof->at(proof->size()-1).subproof.value();
+    second_layer = &proof->at(proof->size()-1).subproof;
         //----------------------------------------------------------------
         second_layer->emplace_back(decomposed.first);
-         third_layer = &second_layer->at(second_layer->size()-1).subproof.value();
+         third_layer = &second_layer->at(second_layer->size()-1).subproof;
             //----------------------------------------------------------------
             third_layer->push_back(Step(
                 decomposed.second,
@@ -268,7 +268,7 @@ void condR(TruthNode* assume, std::vector<Step> *proof){
             ));    
         //----------------------------------------------------------------    
         second_layer->emplace_back(*decomposed.first.get_negation());
-        third_layer = &second_layer->at(second_layer->size()-1).subproof.value();
+        third_layer = &second_layer->at(second_layer->size()-1).subproof;
             //----------------------------------------------------------------
             third_layer->push_back(Step(
                 goal2,
@@ -313,13 +313,13 @@ void ncondR(TruthNode* assume, std::vector<Step> *proof){
         decomposed.second.get_negation());
     
     proof->emplace_back(*goal.get_negation());
-    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof.value();
+    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof;
         //----------------------------------------------------------------
         second_layer->emplace_back(decomposed.first);
-        std::vector<Step>* third_layer = &second_layer->at(second_layer->size()-1).subproof.value();
+        std::vector<Step>* third_layer = &second_layer->at(second_layer->size()-1).subproof;
             //----------------------------------------------------------------
             third_layer->emplace_back(*decomposed.second.get_negation());
-            std::vector<Step>* fourth_layer = &third_layer->at(third_layer->size()-1).subproof.value();
+            std::vector<Step>* fourth_layer = &third_layer->at(third_layer->size()-1).subproof;
                 //----------------------------------------------------------------
                 fourth_layer->push_back(Step(
                     goal,
@@ -379,10 +379,10 @@ void bcondR(TruthNode* assume, std::vector<Step> *proof){
         decomposed.first.get_negation());
         
     proof->emplace_back(goal.get_negation_v());
-    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof.value();
+    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof;
         //----------------------------------------------------------------
         second_layer->emplace_back(decomposed.first);
-        std::vector<Step>* third_layer = &second_layer->at(second_layer->size()-1).subproof.value();
+        std::vector<Step>* third_layer = &second_layer->at(second_layer->size()-1).subproof;
             //----------------------------------------------------------------
             third_layer->push_back(Step(
                 goal,
@@ -438,7 +438,7 @@ void bcondR(TruthNode* assume, std::vector<Step> *proof){
     );
     
     proof->emplace_back(decomposed.first);
-    second_layer = &proof->at(proof->size()-1).subproof.value();
+    second_layer = &proof->at(proof->size()-1).subproof;
         //----------------------------------------------------------------
         second_layer->push_back(Step(
             decomposed.second,
@@ -459,10 +459,10 @@ void bcondR(TruthNode* assume, std::vector<Step> *proof){
         ));
     //----------------------------------------------------------------
     proof->emplace_back(decomposed.first.get_negation_v());
-    second_layer = &proof->at(proof->size()-1).subproof.value();
+    second_layer = &proof->at(proof->size()-1).subproof;
         //----------------------------------------------------------------
         second_layer->emplace_back(decomposed.second);
-         third_layer = &second_layer->at(second_layer->size()-1).subproof.value();
+         third_layer = &second_layer->at(second_layer->size()-1).subproof;
             //----------------------------------------------------------------
             third_layer->push_back(Step(
                 decomposed.first,
@@ -517,13 +517,13 @@ void nbcondR(TruthNode* assume, std::vector<Step> *proof){
         second_goal
     );
     proof->emplace_back(*goal.get_negation());
-    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof.value();
+    std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof;
         //----------------------------------------------------------------      
         second_layer->emplace_back(decomposed.first);
-        std::vector<Step>* third_layer = &second_layer->at(second_layer->size()-1).subproof.value();
+        std::vector<Step>* third_layer = &second_layer->at(second_layer->size()-1).subproof;
             //----------------------------------------------------------------
             third_layer->emplace_back(*decomposed.second.get_negation());
-            std::vector<Step>* fourth_layer = &third_layer->at(third_layer->size()-1).subproof.value();
+            std::vector<Step>* fourth_layer = &third_layer->at(third_layer->size()-1).subproof;
                 //----------------------------------------------------------------
                 fourth_layer->push_back(Step(
                     *first_goal,
@@ -555,10 +555,10 @@ void nbcondR(TruthNode* assume, std::vector<Step> *proof){
             ));
         //----------------------------------------------------------------    
         second_layer->emplace_back(decomposed.second);
-        third_layer = &second_layer->at(second_layer->size()-1).subproof.value();
+        third_layer = &second_layer->at(second_layer->size()-1).subproof;
             //----------------------------------------------------------------
             third_layer->emplace_back(*decomposed.first.get_negation());
-            fourth_layer = &third_layer->at(third_layer->size()-1).subproof.value();
+            fourth_layer = &third_layer->at(third_layer->size()-1).subproof;
                 //----------------------------------------------------------------
                 fourth_layer->push_back(Step(
                     *second_goal,
@@ -644,12 +644,12 @@ void checkNode(TruthNode *tnode, std::vector<Step> *proof){
 
             case DecompositionRule::NegatedConjunction:
                 proof->push_back(Step(tnode->expr));
-                proof = &proof->at(proof->size()-1).subproof.value();
+                proof = &proof->at(proof->size()-1).subproof;
                 break;
 
             case DecompositionRule::Disjunction:
                 proof->push_back(Step(tnode->expr));
-                proof = &proof->at(proof->size()-1).subproof.value();
+                proof = &proof->at(proof->size()-1).subproof;
                 break;
 
             case DecompositionRule::NegatedDisjunction:
@@ -661,7 +661,7 @@ void checkNode(TruthNode *tnode, std::vector<Step> *proof){
 
             case DecompositionRule::Conditional:
                 proof->push_back(Step(tnode->expr));
-                proof = &proof->at(proof->size()-1).subproof.value();
+                proof = &proof->at(proof->size()-1).subproof;
                 break;
 
             case DecompositionRule::NegatedConditional:
@@ -673,11 +673,11 @@ void checkNode(TruthNode *tnode, std::vector<Step> *proof){
 
             case DecompositionRule::Biconditional:
                 proof->push_back(Step(tnode->expr));
-                proof = &proof->at(proof->size()-1).subproof.value();
+                proof = &proof->at(proof->size()-1).subproof;
                 break;
             case DecompositionRule::NegatedBiconditional:
                 proof->push_back(Step(tnode->expr));
-                proof = &proof->at(proof->size()-1).subproof.value();
+                proof = &proof->at(proof->size()-1).subproof;
                 break;
             
             case DecompositionRule::Closure:
@@ -769,6 +769,6 @@ Proof to_proof(std::pair<TruthNode *, int> tt){
         InferenceRule::NegationElimination,
         StepLoc{&ans.proof,1}
     ));
-    checkNode(tt.first,&ans.proof.at(0).subproof.value());
+    checkNode(tt.first,&ans.proof.at(0).subproof);
     return ans;
 }

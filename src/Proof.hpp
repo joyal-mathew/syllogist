@@ -30,14 +30,14 @@ struct Step {
     Expr expr;
     InferenceRule::InferenceRule rule;
     std::optional<std::vector<std::pair<std::vector<Step>*,int>>> references;
-    std::optional<std::vector<Step>> subproof;
+    std::vector<Step> subproof;
     int line_number;
 
     Step(Expr e, bool sp = true)
         : expr(e), rule(InferenceRule::Assume){
             if(sp){
-                subproof = std::make_optional(std::vector<Step>());
-                subproof->reserve(DEFAULT_PROOF_CAP);
+                subproof = {};
+                subproof.reserve(DEFAULT_PROOF_CAP);
             }
         }
 
@@ -46,8 +46,8 @@ struct Step {
         : expr(e), rule(r){
             references = std::make_optional(std::vector<std::pair<std::vector<Step>*,int>>());
             references.value().push_back(sl);
-            subproof = std::make_optional(std::vector<Step>());
-            subproof->reserve(DEFAULT_PROOF_CAP);
+            subproof = {};
+            subproof.reserve(DEFAULT_PROOF_CAP);
         }
 
     Step(const Step &step) : expr(step.expr), rule(step.rule), references(step.references), subproof(step.subproof) {}
