@@ -24,7 +24,7 @@ namespace InferenceRule {
     };
 }
 
-#define DEFAULT_PROOF_CAP 4096
+#define DEFAULT_PROOF_CAP 64
 
 struct Step {
     Expr expr;
@@ -49,6 +49,8 @@ struct Step {
         }
 
     Step(const Step &step) : expr(step.expr), rule(step.rule), references(step.references), subproof(step.subproof) {}
+
+    bool has_subproof();
 };
 
 typedef std::pair<std::vector<Step>*,int> StepLoc;

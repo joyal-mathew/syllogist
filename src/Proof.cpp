@@ -28,6 +28,11 @@ void checkNode(TruthNode* tnode, std::vector<Step> *proof);
 //------- Proof Functions --------//
 //--------------------------------//
 
+// Returns True if Step has a subproof
+bool Step::has_subproof() {
+    return !subproof.empty();
+}
+
 // The lines are seperations for different layers
 void dnR(TruthNode* assume, std::vector<Step> *proof){
     proof->push_back(Step(assume->expr.get_unnegation_v(),InferenceRule::NegationElimination,mapping.at(assume)));

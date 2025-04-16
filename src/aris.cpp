@@ -122,17 +122,11 @@ std::string reference_print(std::vector<StepLoc>& refs, InferenceRule::Inference
 }
 
 void subproof(std::ostream& file, std::vector<Step>& proof, int& line_num, int& indent_level, int& proof_num) {
-    std::string indent(indent_level * 2, ' ');
-    for (unsigned int i = 0; i < proof.size() ; i++) {
-        //file << indent << "<step linenum=\"" << line_num++ << "\">\n";
-        file << indent <<  proof[i].expr.to_string() << "\n";
-        //file << indent << "<rule>EMPTY_RULE</rule>" << "\n";
-        //file << indent << "</step>\n";
-        if (proof[i].subproof.has_value()) { // Start of new subproof
-            subproof(file, proof[i].subproof.value(), line_num, ++indent_level, proof_num);
-        }
-    }
-    indent_level--;
+    (void)file;
+    (void)proof;
+    (void)line_num;
+    (void)indent_level;
+    (void)proof_num;
 }
 
 void to_aris(Proof& proof) {
@@ -174,11 +168,11 @@ void to_aris(Proof& proof) {
 void to_plain_subproof(std::ofstream& file, std::vector<Step>& proof, int& line_num, int& indent_level) {
     std::string subproof_end;
     for (unsigned int i = 0; i < proof.size(); i++) {
-        if (proof[i].subproof.has_value()) { // Subproof
+        if (proof[i].has_subproof()) { // Subproof
             file << line_num << ". " << sub_proof_indent(indent_level) << "┌ " << proof[i].expr.to_string() << " : " << rule_to_string_plain(proof[i].rule) << "\n";
             proof[i].line_number = line_num;
             line_num++;
-            to_plain_subproof(file, proof[i].subproof.value(), line_num, ++indent_level);
+            to_plain_subproof(file, proof[i].subproof, line_num, ++indent_level);
         } else { // Regular Step
             if (indent_level > 0 && (i+1 == proof.size())) {
                 subproof_end = "└ ";
