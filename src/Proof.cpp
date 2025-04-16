@@ -215,7 +215,7 @@ void condR(TruthNode* assume, std::vector<Step> *proof){
             third_layer->push_back(Step(
                 goal,
                 InferenceRule::DisjunctionIntroduction,
-                StepLoc{second_layer, second_layer->size()-1}
+                StepLoc{proof, proof->size()-1}
             ));
             third_layer->push_back(Step(
                 Expr(ExprType::Contradiction),
@@ -392,7 +392,7 @@ void bcondR(TruthNode* assume, std::vector<Step> *proof){
             third_layer->push_back(Step(
                 goal,
                 InferenceRule::DisjunctionIntroduction,
-                StepLoc{second_layer, second_layer->size()-1}
+                StepLoc{proof, proof->size()-1}
             ));
             third_layer->push_back(Step(
                 Expr(ExprType::Contradiction),
