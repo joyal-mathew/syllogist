@@ -147,7 +147,7 @@ void ndisR(TruthNode* assume, std::vector<Step> *proof){
         second_layer->push_back(Step(
             assume->expr.get_unnegation_v(),
             InferenceRule::DisjunctionIntroduction,
-            StepLoc{second_layer, second_layer->size()-1}
+            StepLoc{proof, proof->size()-1}
         ));
         second_layer->push_back(Step(
             Expr(ExprType::Contradiction),
@@ -178,7 +178,7 @@ void ndisR(TruthNode* assume, std::vector<Step> *proof){
         second_layer->at(second_layer->size()-1).references.value().push_back(StepLoc{second_layer,0});
     //----------------------------------------------------------------    
     proof->push_back(Step(
-        decomposed.first.get_negation_v(),
+        decomposed.second.get_negation_v(),
         InferenceRule::NegationIntroduction,
         StepLoc{proof,proof->size()-1}
     ));       
