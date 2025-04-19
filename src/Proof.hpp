@@ -48,7 +48,12 @@ struct Step {
             subproof.reserve(DEFAULT_PROOF_CAP);
         }
 
-    Step(const Step &step) : expr(step.expr), rule(step.rule), references(step.references), subproof(step.subproof) {}
+    Step(const Step &step) : expr(step.expr), rule(step.rule), references(step.references), subproof() {
+        subproof.reserve(DEFAULT_PROOF_CAP);
+        for (const Step& substep : step.subproof) {
+            subproof.push_back(substep);
+        }
+    }
 
     bool has_subproof();
 };
