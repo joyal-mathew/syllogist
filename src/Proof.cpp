@@ -165,13 +165,12 @@ void ndisR(TruthNode* assume, std::vector<Step> *proof){
     proof->push_back(second_assume2);
     std::vector<Step>* second_layer2 = &proof->at(proof->size()-1).subproof;
         //----------------------------------------------------------------
-        std::cout << second_layer << "first print \n";
+        
         second_layer2->push_back(Step(
             assume->expr.get_unnegation_v(),
             InferenceRule::DisjunctionIntroduction,
-            StepLoc{second_layer2, second_layer2->size()-1}
+            StepLoc{proof, proof->size()-1}
         ));
-        std::cout << second_layer << "second print \n";
         second_layer2->push_back(Step(
             Expr(ExprType::Contradiction),
             InferenceRule::ContradictionIntroduction,
@@ -179,6 +178,7 @@ void ndisR(TruthNode* assume, std::vector<Step> *proof){
         ));
         second_layer2->at(second_layer2->size()-1).references.value().push_back(StepLoc{second_layer2,0});
     //----------------------------------------------------------------    
+
     proof->push_back(Step(
         decomposed.second.get_negation_v(),
         InferenceRule::NegationIntroduction,
@@ -191,8 +191,10 @@ void ndisR(TruthNode* assume, std::vector<Step> *proof){
         InferenceRule::ConjunctionIntroduction,
         StepLoc{proof,proof->size()-3}
     )); 
+    
     proof->at(proof->size()-1).references.value().push_back(StepLoc{proof,proof->size()-2});
     mapping.at(assume) = StepLoc{proof,proof->size()-1};
+
 }
 
 
