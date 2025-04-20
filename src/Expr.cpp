@@ -99,7 +99,7 @@ std::pair<Expr, Expr> Expr::decompose() const {
     return std::make_pair(lhs, rhs);
 }
 
-std::string Expr::to_string(bool willow) {
+std::string Expr::to_string(bool willow, bool root) {
     switch (type) {
         case ExprType::Atom:
             return std::string(1, std::get<2>(data));
@@ -108,15 +108,31 @@ std::string Expr::to_string(bool willow) {
         case ExprType::Open_Branch:
             return "◯";
         case ExprType::Negation:
-            return "¬"+std::get<1>(data)->to_string(willow);
-        case ExprType::Conjunction:
-            return "("+std::get<0>(data).first->to_string(willow)+" ∧ "+std::get<0>(data).second->to_string(willow)+")";
-        case ExprType::Disjunction:
-            return "("+std::get<0>(data).first->to_string(willow)+" ∨ "+std::get<0>(data).second->to_string(willow)+")";
-        case ExprType::Conditional:
-            return "("+std::get<0>(data).first->to_string(willow)+" → "+std::get<0>(data).second->to_string(willow)+")";
-        case ExprType::Biconditional:
-            return "("+std::get<0>(data).first->to_string(willow)+" ↔ "+std::get<0>(data).second->to_string(willow)+")";
+            return "¬"+std::get<1>(data)->to_string(willow, false);
+        case ExprType::Conjunction: {
+            if (root)
+                return std::get<0>(data).first->to_string(willow, false)+" ∧ "+std::get<0>(data).second->to_string(willow, false);
+            else
+                return "("+std::get<0>(data).first->to_string(willow, false)+" ∧ "+std::get<0>(data).second->to_string(willow, false)+")";
+        }
+        case ExprType::Disjunction: {
+            if (root)
+                return std::get<0>(data).first->to_string(willow, false)+" ∨ "+std::get<0>(data).second->to_string(willow, false);
+            else
+                return "("+std::get<0>(data).first->to_string(willow, false)+" ∨ "+std::get<0>(data).second->to_string(willow, false)+")";
+        }
+        case ExprType::Conditional: {
+            if (root)
+                return std::get<0>(data).first->to_string(willow, false)+" → "+std::get<0>(data).second->to_string(willow, false);
+            else
+                return "("+std::get<0>(data).first->to_string(willow, false)+" → "+std::get<0>(data).second->to_string(willow, false)+")";
+            }
+        case ExprType::Biconditional: {
+            if (root)
+                return std::get<0>(data).first->to_string(willow, false)+" ↔ "+std::get<0>(data).second->to_string(willow, false);
+            else
+                return "("+std::get<0>(data).first->to_string(willow, false)+" ↔ "+std::get<0>(data).second->to_string(willow, false)+")";
+        }
     }
     return "";
 }

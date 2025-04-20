@@ -11,58 +11,60 @@
 #include "Proof.hpp"
 
 // Aligns the rules (thank god for ai)
-void align(const std::string& input_file, const std::string& output_file) {
+void align(const std::string& input_file, const std::string& output_file, int max_line_number) {
     std::ifstream in_file(input_file);
     std::vector<std::string> lines;
     std::vector<size_t> colon_positions;
-    
-    // Read all lines and find colon positions
+
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
     std::string line;
     size_t max_display_width = 0;
-    
-    // Convert to wide string to get proper character width
-    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-    
+
+    size_t max_line_num_width = std::to_string(max_line_number).length();
+
     while (std::getline(in_file, line)) {
+        // Split line number and the rest
+        size_t dot_pos = line.find('.');
+        if (dot_pos != std::string::npos) {
+            std::string num_part = line.substr(0, dot_pos);
+            std::string rest = line.substr(dot_pos + 1);
+
+            // Trim leading space after dot
+            if (!rest.empty() && rest[0] == ' ') rest = rest.substr(1);
+
+            // Pad to align with max width
+            size_t padding_needed = max_line_num_width - num_part.length();
+            line = num_part + "." + std::string(padding_needed + 1, ' ') + rest;
+        }
+
         lines.push_back(line);
-        
-        // Find the position of the colon sequence " : "
+
         size_t byte_pos = line.find(" : ");
         if (byte_pos != std::string::npos) {
-            // Convert the substring up to the colon to wide string to get visual width
             std::wstring wide_prefix = converter.from_bytes(line.substr(0, byte_pos));
             size_t display_width = wide_prefix.length();
-            
             colon_positions.push_back(display_width);
             max_display_width = std::max(max_display_width, display_width);
         } else {
-            // If no colon, mark with -1
             colon_positions.push_back(static_cast<size_t>(-1));
         }
     }
-    
+
     in_file.close();
-    
-    // Write aligned output
+
     std::ofstream out_file(output_file);
-    
     for (size_t i = 0; i < lines.size(); ++i) {
         if (colon_positions[i] != static_cast<size_t>(-1)) {
-            // Line has a colon, align it
             size_t byte_pos = lines[i].find(" : ");
             std::string prefix = lines[i].substr(0, byte_pos);
             std::string suffix = lines[i].substr(byte_pos);
-            
-            // Pad with spaces to align based on display width
             size_t padding = max_display_width - colon_positions[i];
-            std::string padded_line = prefix + std::string(padding, ' ') + suffix;
-            out_file << padded_line << "\n";
+            out_file << prefix << std::string(padding, ' ') << suffix << "\n";
         } else {
-            // Line has no colon, write as is
             out_file << lines[i] << "\n";
         }
     }
-    
+
     out_file.close();
 }
 
@@ -97,26 +99,25 @@ std::string rule_to_string_plain(InferenceRule::InferenceRule rule) {
 std::string reference_print(std::vector<StepLoc>& refs, InferenceRule::InferenceRule rule) {
     (void) rule;
     std::string res = " (";
-    std::cout << "refs size - " << refs.size() << " :";
     for (unsigned int i = 0; i < refs.size(); i++) {
         Step* step = &refs[i].first->at(refs[i].second);
-        std::cout << " " + step->expr.to_string() << " " << step;
         res += std::to_string(step->line_number);
-        // if (step->subproof.has_value()) {
-        //     switch (rule) {
-        //         case InferenceRule::DisjunctionElimination:
-        //         case InferenceRule::ConditionalIntroduction:
-        //         case InferenceRule::BiconditionalIntroduction: {
-        //             res+= "-" + std::to_string(step->subproof.value().at(step->subproof.value().size()-1).line_number);
-        //             break; }
-        //         default:
-        //             break;
-        //     }
-        // }
+        if (step->has_subproof()) {
+            switch (rule) {
+                case InferenceRule::DisjunctionElimination:
+                case InferenceRule::NegationIntroduction:
+                case InferenceRule::ConditionalIntroduction:
+                case InferenceRule::BiconditionalIntroduction: {
+                    res+= "-" + std::to_string(step->subproof.at(step->subproof.size()-1).line_number);
+                    break; }
+                
+                default:
+                    break;
+            }
+        }
         if (i != refs.size()-1)
             res+=", ";
     }
-    std::cout << "\n";
     res += ")";
     return res;
 }
@@ -154,6 +155,9 @@ void to_aris(Proof& proof) {
         file << indent << "</assumption>\n";
     }
 
+    std::vector<std::vector<Step>*> proofs;
+    proofs.push_back(&proof.proof);
+
     // Proof
     subproof(file, proof.proof, line_num, ++indent_level, ++proof_num);
 
@@ -178,8 +182,8 @@ void to_plain_subproof(std::ofstream& file, std::vector<Step>& proof, int& line_
                 subproof_end = "└ ";
                 indent_level--;
             }
-            std::cout << "At expr - " << proof[i].expr.to_string() << " " << &proof[i] << "\n";
             file << line_num << ". " << sub_proof_indent(indent_level) << subproof_end << proof[i].expr.to_string() << " : " << rule_to_string_plain(proof[i].rule) << reference_print(proof[i].references.value(), proof[i].rule) << "\n";
+            // file << line_num << ". " << sub_proof_indent(indent_level) << subproof_end << proof[i].expr.to_string() << " : " << rule_to_string_plain(proof[i].rule) << "\n";
             proof[i].line_number = line_num;
             line_num++;
         }
@@ -195,7 +199,7 @@ void to_plain(Proof& proof) {
 
     // Premises
     for (unsigned int i = 0; i < proof.premises.size(); i++) {
-        file << line_num << "  " << indent << proof.premises[i].expr.to_string() << " : " << "Premise" << "\n";
+        file << line_num << ". " << indent << proof.premises[i].expr.to_string() << " : " << "Premise" << "\n";
         proof.premises[i].line_number = line_num;
         line_num++;
     }
@@ -203,5 +207,5 @@ void to_plain(Proof& proof) {
 
     file.close();
 
-    align("build/proof.txt", "build/proof_aligned.txt");
+    align("build/proof.txt", "build/proof_aligned.txt", proof.proof[proof.proof.size()-1].line_number);
 }

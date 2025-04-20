@@ -28,8 +28,8 @@ int main(int argc, char **argv) {
     if (truth_tree.first) {
         std::cout << "Argument is valid\n";
         Proof proof = to_proof(truth_tree);
-        // to_aris(proof);
         to_plain(proof);
+        //to_aris(proof);
     }
     else
         std::cout << "Argument is invalid\n";
