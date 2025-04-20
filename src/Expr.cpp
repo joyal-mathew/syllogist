@@ -108,15 +108,15 @@ std::string Expr::to_string(bool willow) {
         case ExprType::Open_Branch:
             return "◯";
         case ExprType::Negation:
-            return "¬( "+std::get<1>(data)->to_string(willow)+" )";
+            return "¬"+std::get<1>(data)->to_string(willow);
         case ExprType::Conjunction:
-            return "( "+std::get<0>(data).first->to_string(willow)+" ∧ "+std::get<0>(data).second->to_string(willow)+" )";
+            return "("+std::get<0>(data).first->to_string(willow)+" ∧ "+std::get<0>(data).second->to_string(willow)+")";
         case ExprType::Disjunction:
-            return "( "+std::get<0>(data).first->to_string(willow)+" ∨ "+std::get<0>(data).second->to_string(willow)+" )";
+            return "("+std::get<0>(data).first->to_string(willow)+" ∨ "+std::get<0>(data).second->to_string(willow)+")";
         case ExprType::Conditional:
-            return "( "+std::get<0>(data).first->to_string(willow)+" → "+std::get<0>(data).second->to_string(willow)+" )";
+            return "("+std::get<0>(data).first->to_string(willow)+" → "+std::get<0>(data).second->to_string(willow)+")";
         case ExprType::Biconditional:
-            return "( "+std::get<0>(data).first->to_string(willow)+" ↔ "+std::get<0>(data).second->to_string(willow)+" )";
+            return "("+std::get<0>(data).first->to_string(willow)+" ↔ "+std::get<0>(data).second->to_string(willow)+")";
     }
     return "";
 }

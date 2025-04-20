@@ -111,7 +111,7 @@ void nconR(TruthNode* assume, std::vector<Step> *proof){
             StepLoc{second_layer,4}
         ));
         second_layer->push_back(Step(
-            Expr(ExprType::Disjunction,first_copy,second_copy),
+            Expr(ExprType::Conjunction,first_copy,second_copy),
             InferenceRule::ConjunctionIntroduction,
             StepLoc{second_layer,2}
         ));
@@ -119,7 +119,7 @@ void nconR(TruthNode* assume, std::vector<Step> *proof){
         second_layer->push_back(Step(
             Expr(ExprType::Contradiction),
             InferenceRule::ContradictionIntroduction,
-            StepLoc{proof, proof->size()-2}
+            StepLoc{proof, proof->size()-1}
         ));
         second_layer->at(second_layer->size()-1).references.value().push_back(StepLoc{second_layer,6});
     //----------------------------------------------------------------    
