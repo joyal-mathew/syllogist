@@ -76,6 +76,24 @@ std::string sub_proof_indent(int length) {
     return res;
 }
 
+std::string rule_to_string(InferenceRule::InferenceRule rule) {
+    switch (rule) {
+        case InferenceRule::ContradictionIntroduction: return "CONTRADICTION";
+        case InferenceRule::ContradictionElimination: return "PRINCIPLE_OF_EXPLOSION";
+        case InferenceRule::NegationIntroduction: return "PROOF_BY_CONTRADICTION";
+        case InferenceRule::NegationElimination: return "DOUBLENEGATION";
+        case InferenceRule::ConjunctionIntroduction: return "CONJUNCTION";
+        case InferenceRule::ConjunctionElimination: return "SIMPLIFICATION";
+        case InferenceRule::DisjunctionIntroduction: return "ADDITION";
+        case InferenceRule::DisjunctionElimination: return "DISJUNCTIVE_ELIMINATION";
+        case InferenceRule::ConditionalIntroduction: return "CONDITIONAL_PROOF";
+        case InferenceRule::ConditionalElimination: return "MODUS_PONENS";
+        case InferenceRule::BiconditionalIntroduction: return "BICONDITIONAL_INTRO";
+        case InferenceRule::BiconditionalElimination: return "BICONDITIONAL_ELIM";
+        default: return "EMPTY_RULE"; // None for assumption or reiteration
+    }
+}
+
 std::string rule_to_string_plain(InferenceRule::InferenceRule rule) {
     switch (rule) {
         case InferenceRule::Assume: return "Assume";
@@ -122,50 +140,66 @@ std::string reference_print(std::vector<StepLoc>& refs, InferenceRule::Inference
     return res;
 }
 
-void subproof(std::ostream& file, std::vector<Step>& proof, int& line_num, int& indent_level, int& proof_num) {
-    (void)file;
-    (void)proof;
-    (void)line_num;
-    (void)indent_level;
-    (void)proof_num;
+void step_print(std::ofstream& file, Step &step) {
+    file << "    <step linenum=\"" << step.line_number << "\">\n";
+    file << "      <raw>" << step.expr.to_string() << "</raw>\n";
+    file << "      <rule>" << rule_to_string(step.rule) << "</rule>\n";
+    for (unsigned int i = 0; i < step.references.value().size(); i++) {
+        Step* ref_step = &step.references.value()[i].first->at(step.references.value()[i].second);
+        file << "      <premise>" << ref_step->line_number << "</premise>\n";
+    }
+    file << "    </step>\n";
+}
+
+void proof_print(std::ofstream& file, std::vector<Step> &proof, Step* assumption, std::vector<std::pair<std::vector<Step>*, Step*>> &proof_vec) {
+    if (assumption != nullptr) { // Only ever false for root proof (proofs[0])
+        file << "    <assumption linenum=\"" << assumption->line_number << "\">\n";
+        file << "       <raw>" << assumption->expr.to_string() << "</raw>\n";
+        file << "    </assumption>\n";
+    }
+    for (unsigned int i = 0; i < proof.size(); i++) {
+        if (proof[i].has_subproof()) {
+            file << "    <step linenum=\"" << proof[i].line_number << "\">\n";
+            file << "      <rule>SUBPROOF</rule>\n";
+            file << "      <premise>" << proof_vec.size() << "</premise>\n";
+            file << "    </step>\n";
+            proof_vec.push_back(std::make_pair(&proof[i].subproof, &proof[i]));
+        } else {
+            step_print(file, proof[i]);
+        }
+    }
 }
 
 void to_aris(Proof& proof) {
-    int indent_level = 1;
-    int proof_num = 0;
-    int line_num = 0;
-    std::string indent(indent_level * 2, ' ');
+    std::vector<std::pair<std::vector<Step>*, Step*>> proofs; // First is subproof, Second is its assumption
     std::ofstream file;
     file.open("build/aris.txt");
 
-    //! Switching to TinyXML soon...
-    
     // Header
     file << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n";
     file << "<bram>\n";
-    file << indent << "<program>Aris</program>\n";
-    file << indent << "<version>0.1.0</version>\n";
-    file << indent << "<proof id=\"" << proof_num <<"\">\n";
-    proof_num++;
+    file << "  <program>Aris</program>\n";
+    file << "  <version>0.1.0</version>\n";
+    file << "  <proof id=\"" << proofs.size() <<"\">\n";
     
     // Premises
     for (unsigned int i = 0; i < proof.premises.size(); i++) {
-        file << indent << "<assumption linenum=\"" << line_num++ << "\">\n";
-        file << indent << "  <raw>" << proof.premises[i].expr.to_string() << "</raw>\n";
-        file << indent << "</assumption>\n";
+        file << "    <assumption linenum=\"" << proof.premises[i].line_number << "\">\n"; // Run plain proof first for this to not break
+        file << "      <raw>" << proof.premises[i].expr.to_string() << "</raw>\n";
+        file << "    </assumption>\n";
     }
 
-    std::vector<std::vector<Step>*> proofs;
-    proofs.push_back(&proof.proof);
+    proofs.push_back(std::make_pair(&proof.proof, nullptr));
 
     // Proof
-    subproof(file, proof.proof, line_num, ++indent_level, ++proof_num);
+    for (unsigned int i = 0; i < proofs.size(); i++) {
+        if (i != 0)
+            file << "  <proof id=\"" << i << "\">\n";
+        proof_print(file, *proofs[i].first, proofs[i].second, proofs);
+        file << "  </proof>\n";
+    }
 
-    // Ender
-    file << indent << "</proof>\n";
     file << "</bram>";
-    
-
     file.close();
 }
 
@@ -192,7 +226,7 @@ void to_plain_subproof(std::ofstream& file, std::vector<Step>& proof, int& line_
 
 void to_plain(Proof& proof) {
     int indent_level = 0;
-    int line_num = 1;
+    int line_num = 0;
     std::string indent(indent_level * 2, ' ');
     std::ofstream file;
     file.open("build/proof.txt");
