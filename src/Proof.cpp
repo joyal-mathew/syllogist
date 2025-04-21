@@ -516,7 +516,7 @@ void bcondR(TruthNode* assume, std::vector<Step> *proof){
 // Negated Bicondition Rule Truthtree to Proof
 
 void nbcondR(TruthNode* assume, std::vector<Step> *proof){
-    std::pair<Expr, Expr> decomposed = (*assume->expr.get_unnegation()).decompose();
+    std::pair<Expr, Expr> decomposed = (assume->expr.get_unnegation_v()).decompose();
     Expr *first_copy = new Expr(decomposed.first);
     Expr *second_copy = new Expr(decomposed.second);
     Expr *first_goal = new Expr(ExprType::Conjunction,first_copy,decomposed.second.get_negation());
