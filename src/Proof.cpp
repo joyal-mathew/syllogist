@@ -525,13 +525,13 @@ void nbcondR(TruthNode* assume, std::vector<Step> *proof){
         first_goal,
         second_goal
     );
-    proof->emplace_back(*goal.get_negation());
+    proof->emplace_back(goal.get_negation_v());
     std::vector<Step>* second_layer = &proof->at(proof->size()-1).subproof;
         //----------------------------------------------------------------      
         second_layer->emplace_back(decomposed.first);
         std::vector<Step>* third_layer = &second_layer->at(second_layer->size()-1).subproof;
             //----------------------------------------------------------------
-            third_layer->emplace_back(*decomposed.second.get_negation());
+            third_layer->emplace_back(decomposed.second.get_negation_v());
             std::vector<Step>* fourth_layer = &third_layer->at(third_layer->size()-1).subproof;
                 //----------------------------------------------------------------
                 fourth_layer->push_back(Step(
@@ -566,7 +566,7 @@ void nbcondR(TruthNode* assume, std::vector<Step> *proof){
         second_layer->emplace_back(decomposed.second);
         third_layer = &second_layer->at(second_layer->size()-1).subproof;
             //----------------------------------------------------------------
-            third_layer->emplace_back(*decomposed.first.get_negation());
+            third_layer->emplace_back(decomposed.first.get_negation_v());
             fourth_layer = &third_layer->at(third_layer->size()-1).subproof;
                 //----------------------------------------------------------------
                 fourth_layer->push_back(Step(
