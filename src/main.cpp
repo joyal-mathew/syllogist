@@ -8,16 +8,32 @@
 #include <iostream>
 #include <string>
 
+enum EXIT_STATUS {
+    VALID_PROOF,
+    INVALID_PROOF,
+    PARSING_ERROR
+};
+
 int main(int argc, char **argv) {
-    ASSERT(argc == 2);
+
+    if (argc != 2) {
+        std::cout << "Incorrect Usage\nUSAGE: " << argv[0] << " <argument file>\n";
+        return PARSING_ERROR;
+    }
+
     std::ifstream in_file(argv[1]);
     ASSERT(in_file.is_open());
+
+    int exit_status;
 
     std::vector<Expr *> expressions;
     std::string line;
     while (std::getline(in_file, line)) {
         Expr *expr = parse(line);
-        ASSERT(expr);
+        if (!expr) {
+            std::cout << "Error Parsing File\n";
+            return PARSING_ERROR;
+        }
         expressions.push_back(expr);
     }
 
@@ -30,9 +46,11 @@ int main(int argc, char **argv) {
         Proof proof = to_proof(truth_tree);
         to_plain(proof);
         to_aris(proof);
-    }
-    else
+        exit_status = VALID_PROOF;
+    } else {
         std::cout << "Argument is invalid\n";
+        exit_status = INVALID_PROOF;
+    }
 
     for (Expr *e: expressions) {
         std::cout << *e << "\n";
@@ -41,5 +59,5 @@ int main(int argc, char **argv) {
 
     delete_truth_tree(truth_tree.first);
 
-    return 0;
+    return exit_status;
 }
