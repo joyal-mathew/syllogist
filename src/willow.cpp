@@ -93,7 +93,7 @@ void to_willow(TruthNode* root, int premise_count) {
     
     // Write json file
     std::ofstream file;
-    file.open("build/willow.willow");
+    file.open("output/willow.willow");
     file << j.dump(2);
     file.close();
 }

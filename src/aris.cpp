@@ -173,7 +173,7 @@ void proof_print(std::ofstream& file, std::vector<Step> &proof, Step* assumption
 void to_aris(Proof& proof) {
     std::vector<std::pair<std::vector<Step>*, Step*>> proofs; // First is subproof, Second is its assumption
     std::ofstream file;
-    file.open("build/aris.txt");
+    file.open("output/aris.txt");
 
     // Header
     file << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n";
@@ -229,7 +229,7 @@ void to_plain(Proof& proof) {
     int line_num = 0;
     std::string indent(indent_level * 2, ' ');
     std::ofstream file;
-    file.open("build/proof.txt");
+    file.open("output/proof.txt");
 
     // Premises
     for (unsigned int i = 0; i < proof.premises.size(); i++) {
@@ -241,5 +241,5 @@ void to_plain(Proof& proof) {
 
     file.close();
 
-    align("build/proof.txt", "build/proof_aligned.txt", proof.proof[proof.proof.size()-1].line_number);
+    align("output/proof.txt", "output/proof_aligned.txt", proof.proof[proof.proof.size()-1].line_number);
 }

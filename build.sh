@@ -1,8 +1,12 @@
 #!/usr/bin/env sh
 
+# Syllogist Build System
+
 ### Argument Default Values
 
 BUILD=true
+
+GUI=false
 
 RUN=false
 
@@ -17,6 +21,9 @@ do
     case ${1} in
     -n|--no_build)
         BUILD=false ;;
+
+    -g|--gui)
+        GUI=true ;;
 
     -r|--run)
         RUN=true
@@ -57,7 +64,7 @@ then
     exit 1
 fi
 
-if [ "${BUILD}" = false ] && [ "${RUN}" = false ] && [ "${VALGRIND}" = false ]
+if [ "${BUILD}" = false ] && [ "${GUI}" = false ] && [ "${RUN}" = false ] && [ "${VALGRIND}" = false ]
 then
     echo "Error: No flags set"
     exit 1
@@ -69,6 +76,12 @@ if [ "${BUILD}" = true ]
 then
     echo "Building..."
     g++ -Wall -Wextra -ggdb -o build/syllogist src/*.cpp
+fi
+
+if [ "${GUI}" = true ]
+then 
+    echo "Building Gui..."
+    g++ gui/main.cpp -o build/syllogist_gui -lraylib
 fi
 
 if [ "${RUN}" = true ]

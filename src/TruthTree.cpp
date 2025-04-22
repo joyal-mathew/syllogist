@@ -416,12 +416,12 @@ void write_dot_node(std::ofstream &out, TruthNode *node, bool show_refs) {
 }
 
 /**
- * @brief Write a truth tree as a dot file, written to build/truth_tree.dot
+ * @brief Write a truth tree as a dot file, written to output/truth_tree.dot
  * @param root The root of the truth tree
  * @param show_refs Optional parameter for displaying reference edges
  */
 void export_truth_tree_to_dot(TruthNode *root, bool show_refs) {
-    const std::string filename = "build/truth_tree.dot";
+    const std::string filename = "output/truth_tree.dot";
     std::ofstream out(filename);
     if (!out) {
         std::cerr << "Failed to open file: " << filename << "\n";
