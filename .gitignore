@@ -1,4 +1,7 @@
 .clangd
 .clang-format
 build/*
+!build/.keep
+output/*
+!output/.keep
 .vscode
