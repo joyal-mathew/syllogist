@@ -79,7 +79,7 @@ std::vector<TruthNode *> get_leaves(TruthNode *node) {
  * @param root The root of the truth tree
  * @param seen List of seen atoms
  */
-void closure_check(TruthNode *root, std::unordered_map<u16, TruthNode*> seen = std::unordered_map<u16, TruthNode*>()) {
+void closure_check(TruthNode *root, std::unordered_map<unsigned short, TruthNode*> seen = std::unordered_map<unsigned short, TruthNode*>()) {
     if (root == nullptr)
         return;
     bool isAtom = false;
@@ -96,7 +96,7 @@ void closure_check(TruthNode *root, std::unordered_map<u16, TruthNode*> seen = s
         break;
     }
     if (isAtom) {
-        u16 atom = root->expr.get_atom();
+        unsigned short atom = root->expr.get_atom();
         if (isNegated)
             atom *= -1;
         if (seen.count(atom * -1)) {
@@ -119,7 +119,7 @@ void closure_check(TruthNode *root, std::unordered_map<u16, TruthNode*> seen = s
  */
 void open_branch(TruthNode* root) {
     std::vector<TruthNode *> leaves = get_leaves(root);
-    for (uint i = 0; i < leaves.size(); i++) {
+    for (unsigned int i = 0; i < leaves.size(); i++) {
         if (leaves[i]->expr.type != ExprType::Contradiction) {
             TruthNode* open_branch = new TruthNode(Expr(ExprType::Open_Branch), DecompositionRule::Closure);
             add_child(leaves[i], open_branch, nullptr);
@@ -135,7 +135,7 @@ void open_branch(TruthNode* root) {
  */
 bool is_valid(TruthNode *root) {
     std::vector<TruthNode *> leaves = get_leaves(root);
-    for (uint i = 0; i < leaves.size(); i++) {
+    for (unsigned int i = 0; i < leaves.size(); i++) {
         if (leaves[i]->expr.type != ExprType::Contradiction)
             return false;
     }
@@ -332,7 +332,7 @@ std::pair<TruthNode *, int> compute_truth_tree(std::vector<Expr *> premises){
         unexpanded.push_back(root);
 
     // Add Remaining Premises
-    u64 i = 1;
+    unsigned long i = 1;
     TruthNode *last_node = root;
     while (i < premises.size()){
         TruthNode *child = new TruthNode(Expr(*premises[i]), DecompositionRule::Assume);
@@ -347,7 +347,7 @@ std::pair<TruthNode *, int> compute_truth_tree(std::vector<Expr *> premises){
     while (!unexpanded.empty()){
         std::pair<TruthNode *, DecompositionRule::DecompositionRule> decompose = get_next_decomposition(unexpanded);
         std::vector<TruthNode *> leaves = get_leaves(decompose.first);
-        for (uint i = 0; i < leaves.size(); i++) {
+        for (unsigned int i = 0; i < leaves.size(); i++) {
             std::pair<TruthNode *, TruthNode *> decomposed_children = get_decomposition_children(decompose.first, decompose.second);
             add_child(leaves[i], decomposed_children.first, decomposed_children.second);
             if (decomposed_children.first != nullptr) {

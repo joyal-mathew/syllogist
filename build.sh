@@ -8,6 +8,8 @@ BUILD=true
 
 GUI=false
 
+WIN=false
+
 RUN=false
 
 VALGRIND=false
@@ -21,6 +23,9 @@ do
     case ${1} in
     -n|--no_build)
         BUILD=false ;;
+
+    -w|--windows)
+        WIN=true ;;
 
     -g|--gui)
         GUI=true ;;
@@ -64,7 +69,7 @@ then
     exit 1
 fi
 
-if [ "${BUILD}" = false ] && [ "${GUI}" = false ] && [ "${RUN}" = false ] && [ "${VALGRIND}" = false ]
+if [ "${BUILD}" = false ] && [ "${GUI}" = false ] && [ "${RUN}" = false ] && [ "${VALGRIND}" = false ] && [ "${WIN}" = false ]
 then
     echo "Error: No flags set"
     exit 1
@@ -82,6 +87,12 @@ if [ "${GUI}" = true ]
 then 
     echo "Building Gui..."
     g++ gui/main.cpp -o build/syllogist_gui -lraylib
+fi
+
+if [ "${WIN}" = true ]
+then
+    echo "Building for Windows..."
+    x86_64-w64-mingw32-g++ -std=c++17 -Wall -Wextra -ggdb -o build/syllogist.exe src/*.cpp
 fi
 
 if [ "${RUN}" = true ]

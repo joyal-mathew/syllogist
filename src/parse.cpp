@@ -14,11 +14,11 @@ const Operator OP_TABLE[] = {
     { '=', ExprType::Biconditional },
 };
 
-const u8 MAX_PRECEDENCE = std::extent<decltype (OP_TABLE)>::value;
+const unsigned char MAX_PRECEDENCE = std::extent<decltype (OP_TABLE)>::value;
 
 struct Parser {
     const std::string &source;
-    u64 index;
+    unsigned long index;
     char current;
 
     void skip_whitespace() {
@@ -36,12 +36,12 @@ struct Parser {
         return binary_op(MAX_PRECEDENCE);
     }
 
-    Expr *binary_op(u8 precedence) {
+    Expr *binary_op(unsigned char precedence) {
         if (precedence == 0) {
             return term();
         }
 
-        u8 i = precedence - 1;
+        unsigned char i = precedence - 1;
 
         Expr *expr = binary_op(i);
         if (!expr) return nullptr;

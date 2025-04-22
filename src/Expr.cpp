@@ -38,7 +38,7 @@ Expr::~Expr() {
     }
 }
 
-u16 Expr::get_atom() const {
+unsigned short Expr::get_atom() const {
     if (type == ExprType::Atom)
         return std::get<2>(data);
     if (type == ExprType::Negation)

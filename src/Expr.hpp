@@ -1,7 +1,5 @@
 #pragma once
 
-#include "types.hpp"
-
 #include <ostream>
 #include <utility>
 #include <variant>
@@ -22,7 +20,7 @@ namespace ExprType {
 
 class Expr;
 
-typedef std::variant<std::pair<Expr *, Expr *>, Expr *, u16, std::monostate>
+typedef std::variant<std::pair<Expr *, Expr *>, Expr *, unsigned short, std::monostate>
     ExprDataUnion;
 
 class Expr {
@@ -36,7 +34,7 @@ public:
         : data(data), type(type) {}
 
     Expr(ExprType::ExprType type) : data(std::monostate{}), type(type) {}
-    Expr(ExprType::ExprType type, u16 symbol) : data(symbol), type(type) {}
+    Expr(ExprType::ExprType type, unsigned short symbol) : data(symbol), type(type) {}
     Expr(ExprType::ExprType type, Expr *operand) : data(operand), type(type) {}
     Expr(ExprType::ExprType type, Expr *lhs, Expr *rhs)
         : data(std::make_pair(lhs, rhs)), type(type) {}
@@ -44,7 +42,7 @@ public:
     Expr(const Expr &expr);
     ~Expr();
 
-    u16 get_atom() const;
+    unsigned short get_atom() const;
     void negate();
     void unnegate();
     Expr *get_negation() const;
