@@ -10,7 +10,9 @@ Developed by Anthony Fabius, Joyal Mathew, and Charlie Chen as a final project f
 
 ### Dependencies
 
-Aside from GCC the only dependency required for this project is Raylib. This is also optional as it is just for building the gui. If you are not making any changes to the gui this library is not needed. Here is the [official installation information](https://github.com/raysan5/raylib?tab=readme-ov-file#build-and-installation).
+GCC for compiling and running Syllogist
+
+Java 11+ for compiling and running the GUI. Java 8.1 may also work but hasn't been tested.
 
 ### Build
 
@@ -44,7 +46,17 @@ B
 
 See [examples/](/examples/) for other proofs.
 
-The results of the argument are then put in [outputs/](/output/). If the argument is valid an Aris Proof as well as a plain text fitch proof is generated. If the argument is invalid a Willow file is generated. Regardless the truth tree to test the validity is also generated as a dot file.~~
+The results of the argument are then put in [outputs/](/output/). If the argument is valid an Aris Proof as well as a plain text fitch proof is generated. If the argument is invalid a Willow file is generated. Regardless the truth tree to test the validity is also generated as a dot file.
+
+Here is the table of characters to logic symbols for reference.
+
+| Character | Logic Symbol |
+|:-----------:|:--------------:|
+| ~         | ¬            |
+| \|        | ∧            |
+| &         | ∨            |
+| >         | →            |
+| =         | ↔            |
 
 ### Developers
 

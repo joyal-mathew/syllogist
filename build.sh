@@ -86,7 +86,7 @@ fi
 if [ "${GUI}" = true ]
 then 
     echo "Building Gui..."
-    g++ gui/main.cpp -o build/syllogist_gui -lraylib
+    javac -d build gui/SyllogistGUI.java 
 fi
 
 if [ "${WIN}" = true ]
