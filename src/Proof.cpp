@@ -360,8 +360,8 @@ void ncondR(TruthNode* assume, std::vector<Step> *proof){
             StepLoc{second_layer,second_layer->size()-1}
         ));
         second_layer->push_back(Step(
-            goal,
-            InferenceRule::DisjunctionIntroduction,
+            Expr(ExprType::Contradiction),
+            InferenceRule::ContradictionIntroduction,
             mapping.at(assume)
         ));
         second_layer->at(second_layer->size()-1).references.value().push_back(StepLoc{second_layer,second_layer->size()-2});
