@@ -51,12 +51,12 @@ The results of the argument are then put in [outputs/](/output/). If the argumen
 Here is the table of characters to logic symbols for reference.
 
 | Character | Logic Symbol |
-|:-----------:|:--------------:|
-| ~         | ¬            |
-| \|        | ∧            |
-| &         | ∨            |
-| >         | →            |
-| =         | ↔            |
+|:---------:|:------------:|
+|     ~     |       ¬      |
+|     &     |       ∧      |
+|     \|    |       ∨      |
+|     >     |       →      |
+|     =     |       ↔      |
 
 ### Developers
 

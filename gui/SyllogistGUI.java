@@ -2,7 +2,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.net.URISyntaxException;
 
+// Praise the heavens for AI
 public class SyllogistGUI {
 
     private static JTextArea inputArea;
@@ -62,9 +66,15 @@ public class SyllogistGUI {
                 writer.write(inputArea.getText());
             }
 
-            String[] command = System.getProperty("os.name").startsWith("Windows")
-                    ? new String[]{"syllogist.exe", "gui_input.txt"}
-                    : new String[]{"./syllogist", "gui_input.txt"};
+            // Get the directory where the class or JAR is located
+            Path baseDir = Paths.get(".").toAbsolutePath().normalize();
+
+            // Build the command using absolute path to the executable
+            Path exePath = baseDir.resolve(
+                System.getProperty("os.name").startsWith("Windows") ? "syllogist.exe" : "syllogist"
+            );
+
+            String[] command = new String[] { exePath.toString(), "gui_input.txt" };
 
             ProcessBuilder builder = new ProcessBuilder(command);
             builder.redirectErrorStream(true);
