@@ -119,7 +119,7 @@ void nconR(TruthNode* assume, std::vector<Step> *proof){
         second_layer->push_back(Step(
             Expr(ExprType::Contradiction),
             InferenceRule::ContradictionIntroduction,
-            StepLoc{proof, proof->size()-1}
+            mapping.at(assume)
         ));
         second_layer->at(second_layer->size()-1).references.value().push_back(StepLoc{second_layer,6});
     //----------------------------------------------------------------    
