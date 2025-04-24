@@ -365,12 +365,11 @@ std::pair<TruthNode *, int> compute_truth_tree(std::vector<Expr *> premises){
         }
     }
     closure_check(root);
-
+    open_branch(root);
     export_truth_tree_to_dot(root);
+    to_willow(root, premises.size());
 
     if (!is_valid(root)){
-        open_branch(root);
-        to_willow(root, premises.size());
         delete_truth_tree(root);
         return std::pair<TruthNode *, int>{nullptr, 0};
     }
@@ -398,11 +397,11 @@ void write_dot_node(std::ofstream &out, TruthNode *node, bool show_refs) {
     }
     out << "    \"" << node << "\" [label=\"" << label_str << "\"];\n";
     if (node->children.first != nullptr) {
-        out << "    \"" << node << "\" -> \"" << node->children.first << "\";\n";
+        out << "    \"" << node << "\" -- \"" << node->children.first << "\";\n";
         write_dot_node(out, node->children.first, show_refs);
     }
     if (node->children.second != nullptr) {
-        out << "    \"" << node << "\" -> \"" << node->children.second << "\";\n";
+        out << "    \"" << node << "\" -- \"" << node->children.second << "\";\n";
         write_dot_node(out, node->children.second, show_refs);
     }
     if(show_refs){
@@ -427,7 +426,7 @@ void export_truth_tree_to_dot(TruthNode *root, bool show_refs) {
         std::cerr << "Failed to open file: " << filename << "\n";
         return;
     }
-    out << "digraph TruthTree {\n";
+    out << "graph TruthTree {\n";
     out << "    rankdir=TB;\n";
     out << "    node [shape=ellipse];\n";
     write_dot_node(out, root, show_refs); 
